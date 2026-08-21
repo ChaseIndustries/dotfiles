@@ -1,0 +1,115 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "GIT_WRAPPER_CONTEXT": "claude"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run ruff *)",
+      "Bash(uv run python -c *)",
+      "Bash(PYTHONPATH=src/backend uv run python *)",
+      "Bash(PYTHONPATH=src/backend uv run pytest *)",
+      "Bash(pytest *)",
+      "Bash(yarn vitest *)",
+      "Bash(yarn test *)",
+      "Bash(yarn build*)",
+      "Bash(yarn tsc *)",
+      "Bash(yarn biome *)",
+      "Bash(make *)",
+      "Bash(docker compose *)",
+      "Bash(ls *)",
+      "Bash(pwd)",
+      "Bash(which *)",
+      "Bash(wc *)",
+      "Bash(mkdir *)",
+      "Bash(jq *)",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Skill(*)",
+      "mcp__linear__*",
+      "mcp__chrome-devtools__*",
+      "mcp__braintrust__*",
+      "Bash(mcp__linear__list_issues)",
+      "Bash(yarn --cwd src/frontend vitest run src/components/views/SkillsPage)",
+      "Bash(grep -E \"\\\\.py$\")"
+    ],
+    "ask": [
+      "Bash(git * --force*)",
+      "Bash(git * -f *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * +*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.path // empty' | { read -r p; [ -n \"$p\" ] && [ -d \"$p/.husky\" ] && (cd \"$p\" && git update-index --skip-worktree .husky/pre-commit .husky/prepare-commit-msg); } 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Glass.aiff"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime --stealth"
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "enabledPlugins": {
+    "beads@beads-marketplace": true,
+    "coderabbit@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "remember@claude-plugins-official": true
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "teammateMode": "auto",
+  "remoteControlAtStartup": true,
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
+  "agentPushNotifEnabled": true
+}

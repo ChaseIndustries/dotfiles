@@ -1,0 +1,22 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\r",
+    },
+    "when": "terminalFocus",
+  },
+  { "key": "cmd+alt+s", "command": "workbench.action.files.saveAll" },
+  {
+    "key": "alt+cmd+s",
+    "command": "workbench.action.toggleUnifiedSidebarFromKeyboard",
+    "when": "cursor.agentIdeUnification.enabled == true && !isAuxiliaryWindowFocusedContext",
+  },
+  {
+    "key": "shift+cmd+escape",
+    "command": "-claude-vscode.editor.open",
+    "when": "!config.claudeCode.useTerminal",
+  },
+]
