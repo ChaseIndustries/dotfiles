@@ -15,7 +15,11 @@ Personal shell config and utilities. No credentials — those live separately.
 | `bin/herdr-new-pane` | `~/bin/herdr-new-pane` |
 | `raycast/herdr-new-workspace.sh` | `~/raycast-scripts/herdr-new-workspace.sh` |
 
-Herdr plugins themselves are installed via `herdr plugin install <owner/repo>`. The plugin config files in `herdr/plugins/` are symlinked so the plugin picks them up.
+`install.sh` also installs the herdr plugins this config depends on
+(`danbuhler/herdr-pane-topic-sync`, `T0mSIlver/herdr-title-wrap`) via
+`herdr plugin install <owner/repo>`, skipped gracefully if herdr isn't
+installed yet. The plugin config files in `herdr/plugins/` are symlinked
+so the plugin picks them up.
 
 `install.sh` also adds a marked block to `~/.zshrc` that puts `~/bin` on
 `PATH` and sources `functions.zsh` (not itself a tracked file, edited in
