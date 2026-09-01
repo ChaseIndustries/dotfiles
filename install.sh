@@ -82,7 +82,8 @@ cmd_install() {
 
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"
-  link "$DOTFILES_DIR/herdr/config.toml"              "$HOME/.config/herdr/config.toml"
+  link "$DOTFILES_DIR/herdr/config.toml"                          "$HOME/.config/herdr/config.toml"
+  link "$DOTFILES_DIR/herdr/plugins/dan.pane-topic-sync/config.toml" "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   link "$DOTFILES_DIR/cursor/settings.json"           "$HOME/Library/Application Support/Cursor/User/settings.json"
   link "$DOTFILES_DIR/cursor/keybindings.json"        "$HOME/Library/Application Support/Cursor/User/keybindings.json"
   link "$DOTFILES_DIR/bin/herdr-new-pane"             "$HOME/bin/herdr-new-pane"
@@ -97,6 +98,7 @@ cmd_uninstall() {
   unlink_file "$HOME/.config/zsh/functions.zsh"
   unlink_file "$HOME/.claude/settings.json"
   unlink_file "$HOME/.config/herdr/config.toml"
+  unlink_file "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   unlink_file "$HOME/Library/Application Support/Cursor/User/settings.json"
   unlink_file "$HOME/Library/Application Support/Cursor/User/keybindings.json"
   unlink_file "$HOME/bin/herdr-new-pane"

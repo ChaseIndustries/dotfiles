@@ -9,10 +9,13 @@ Personal shell config and utilities. No credentials — those live separately.
 | `zsh/functions.zsh` | `~/.config/zsh/functions.zsh` |
 | `claude/settings.json` | `~/.claude/settings.json` |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
+| `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `cursor/settings.json` | `~/Library/Application Support/Cursor/User/settings.json` |
 | `cursor/keybindings.json` | `~/Library/Application Support/Cursor/User/keybindings.json` |
 | `bin/herdr-new-pane` | `~/bin/herdr-new-pane` |
 | `raycast/herdr-new-workspace.sh` | `~/raycast-scripts/herdr-new-workspace.sh` |
+
+Herdr plugins themselves are installed via `herdr plugin install <owner/repo>`. The plugin config files in `herdr/plugins/` are symlinked so the plugin picks them up.
 
 `install.sh` also adds a marked block to `~/.zshrc` that puts `~/bin` on
 `PATH` and sources `functions.zsh` (not itself a tracked file, edited in

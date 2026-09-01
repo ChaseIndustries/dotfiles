@@ -1,0 +1,11 @@
+# Pane Topic Sync plugin config
+# Source: https://github.com/danbuhler/herdr-pane-topic-sync
+# Auto-names panes/tabs from the live agent topic (terminal_title_stripped).
+
+sync_panes = true
+sync_tabs = true
+tab_source = "first"          # "first" (top-left) or "active" (last focused)
+max_label_length = 60
+tab_format = "{n}· {topic}"   # keep the tab switch number
+pane_format = "{topic}"
+respect_manual_names = true
