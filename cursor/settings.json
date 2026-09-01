@@ -81,7 +81,7 @@
     },
     "herdr": {
       "path": "zsh",
-      "args": ["-l", "-c", "exec /opt/homebrew/bin/herdr"],
+      "args": ["-l", "-c", "exec ${env:HOME}/.local/bin/herdr"],
       "env": {
         "GIT_WRAPPER_CONTEXT": "herdr",
       },
