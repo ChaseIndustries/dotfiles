@@ -23,12 +23,16 @@ wired," and `uninstall` strips the block cleanly.
 
 ## Gotchas learned the hard way
 
-- **herdr is a Homebrew install, not `~/.local/bin`.** It lives at
-  `/opt/homebrew/bin/herdr`. Scripts that shell out to it hardcode that
-  absolute path rather than trusting `PATH`, because Cursor terminal
-  profiles and Raycast's silent-mode scripts don't reliably inherit a
-  normal shell `PATH`. Before assuming any tool's location, run
-  `which <tool>` on the actual machine rather than guessing.
+- **herdr lives at `~/.local/bin/herdr`, not a Homebrew path.** It used to
+  be a Homebrew install at `/opt/homebrew/bin/herdr`, but that binary is
+  gone — it migrated to `~/.local/bin/herdr` (confirmed 2026-09-01).
+  Scripts that shell out to it hardcode the absolute path rather than
+  trusting `PATH`, because Cursor terminal profiles and Raycast's
+  silent-mode scripts don't reliably inherit a normal shell `PATH`. Before
+  assuming any tool's location, run `which <tool>` on the actual machine
+  rather than guessing — this exact assumption going stale is what broke
+  `functions.zsh`, `bin/herdr-new-pane`, and `raycast/herdr-new-workspace.sh`
+  all at once.
 - **No personal/company paths baked into scripts.** Project-root defaults
   read from `HERDR_PROJECT_ROOT`, falling back to `~/projects`, not a
   hardcoded work directory. Keep it that way for any new default paths.
