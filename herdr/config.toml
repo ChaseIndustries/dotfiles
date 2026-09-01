@@ -236,10 +236,21 @@ hide_tab_bar_when_single_tab = true
 [ui.sidebar.agents]
 # Blank rows between agent entries. Set to 1 to restore the previous spacing.
 # row_gap = 0
-rows = [["state_icon", "terminal_title_stripped"], ["workspace", "tab"]]
+# Fallback for agents without a rows_by_agent override below (non-Claude agents,
+# since title-wrap's $title_lN tokens are Claude-Code-specific).
+rows = [["state_icon", { token = "terminal_title_stripped", fg = "#ffffff", bold = true, dim = false }], [{ token = "workspace", dim = true }]]
 # Optional canonical agent IDs replace the default rows for matching agents.
-# [ui.sidebar.agents.rows_by_agent]
-# claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+# claude: uses the title-wrap plugin (T0mSIlver/herdr-title-wrap) to wrap the
+# live topic across up to 4 rows ($title_l1..4) instead of truncating it,
+# with the workspace/dir name dim at the bottom.
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  ["state_icon", { token = "$title_l1", fg = "#ffffff", bold = true, dim = false }],
+  [{ token = "$title_l2", fg = "#ffffff", bold = true, dim = false }],
+  [{ token = "$title_l3", fg = "#ffffff", bold = true, dim = false }],
+  [{ token = "$title_l4", fg = "#ffffff", bold = true, dim = false }],
+  [{ token = "workspace", dim = true }],
+]
 
 # Expanded space rows. Built-ins are state_icon, state_text, workspace, branch, and git_status.
 # Custom values reported through workspace metadata use a $name token, for example $jj_status.
