@@ -263,12 +263,13 @@ hide_tab_bar_when_single_tab = true
 # default-colored icon/workspace/tab identity row below it, which stays a
 # single line). herdr plugins can't ship UI config themselves (see
 # herdr-title-wrap's README), so this has to live here.
+agent_panel_sort = "priority"
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  [{ token = "$title_l1", fg = "#ffffff" }],
-  [{ token = "$title_l2", fg = "#ffffff" }],
-  [{ token = "$title_l3", fg = "#ffffff" }],
-  [{ token = "$title_l4", fg = "#ffffff" }],
+  [{ token = "$title_l1", fg = "#ffffff", dim = false }],
+  [{ token = "$title_l2", fg = "#ffffff", dim = false }],
+  [{ token = "$title_l3", fg = "#ffffff", dim = false }],
+  [{ token = "$title_l4", fg = "#ffffff", dim = false }],
   ["state_icon", "workspace", "tab"],
 ]
 
