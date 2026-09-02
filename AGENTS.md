@@ -38,15 +38,15 @@ takes effect on existing machines too, not just fresh ones.
   Raycast's silent-mode scripts don't reliably inherit a full shell `PATH`,
   which is exactly why the fallback list matters, not why hardcoding does.
 - **`command -v <name>` in zsh also matches shell functions/aliases, not
-  just PATH binaries.** If a wrapper function shadows the real command
-  (e.g. `functions.zsh`'s `herdr()` wrapper, which auto-opens herdr-deck on
-  bare `herdr` and shadows the `herdr` binary), resolving that command's
-  path with `command -v` will resolve to the function itself once it's
-  defined — and if the wrapper then calls that "resolved path", it recurses
-  into itself (`FUNCNEST` error). Bites only on re-sourcing within an
+  just PATH binaries.** Hit this when `functions.zsh` briefly had a
+  `herdr()` wrapper (since removed): resolving `herdr`'s path with
+  `command -v` resolved to the wrapper function itself once it was
+  defined, and the wrapper calling that "resolved path" recursed into
+  itself (`FUNCNEST` error). Bites only on re-sourcing within an
   already-live shell, since a fresh process hasn't defined the function yet
-  at the point the resolution line runs — use `whence -p` instead, which
-  is PATH-only and immune to this.
+  at the point the resolution line runs. If you ever wrap a command in a
+  same-named function again, resolve its real binary with `whence -p`
+  instead — it's PATH-only and immune to this.
 - **No personal/company paths baked into scripts.** Project-root defaults
   read from `HERDR_PROJECT_ROOT`, falling back to `~/projects`, not a
   hardcoded work directory. Keep it that way for any new default paths.
@@ -70,15 +70,31 @@ takes effect on existing machines too, not just fresh ones.
   it by first entering herdr (the Cursor `herdr` terminal profile, or a
   native terminal) and using its keybinding (`prefix+o`), not by wiring a
   separate terminal profile to launch it directly.
+- **herdr-deck has no headless/no-prompt mode — don't bind it to every
+  new-pane action.** Checked its source directly: the binary only accepts
+  `--help`, `--open-link`, `--restore-editors`, `--toggle-project`, and
+  `--record-workspace-focus`; any other invocation always launches the
+  interactive picker. We briefly rebound `new_tab`/`split_vertical`/
+  `split_horizontal` to it and reverted after it turned "new tab" into a
+  forced popup + manual pick every time. Keep it on an explicit key
+  (`prefix+o`) only.
+- **herdr-deck's `herdr tab rename` calls fight `pane-topic-sync`'s
+  `respect_manual_names`.** Every deck herdr-deck creates renames its own
+  tabs explicitly; with `respect_manual_names = true` that permanently
+  locks those tabs out of live agent-topic syncing (static "dotfiles"/
+  "lazygit" labels instead of the live task title). Set it `false` if you
+  want live topics to keep winning even over herdr-deck's renames — the
+  trade-off is a tab you rename by hand also gets overwritten on the next
+  sync.
 
 ## Checklist before changing this repo
 
 - [ ] New managed dotfile? Add matching `link` (install) and `unlink_file`
       (uninstall) calls, update `README.md`'s file table, and confirm the
       destination is actually where that app reads its config from.
-- [ ] Script calls an external binary? Resolve it via `command -v` with a
-      fallback list (see the gotcha above) instead of assuming any one
-      fixed path.
+- [ ] Script calls an external binary? Resolve it via `whence -p` (zsh) or
+      `command -v` (elsewhere) with a fallback list (see the gotcha above)
+      instead of assuming any one fixed path.
 - [ ] Re-run `bash install.sh install` twice, second run should be a no-op
       ("already linked" / "already wired" for everything).
 - [ ] Don't touch anything in `~/.zshrc` outside the managed block.

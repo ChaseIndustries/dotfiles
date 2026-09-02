@@ -8,4 +8,9 @@ tab_source = "first"          # "first" (top-left) or "active" (last focused)
 max_label_length = 60
 tab_format = "{n}· {topic}"   # keep the tab switch number
 pane_format = "{topic}"
-respect_manual_names = true
+
+# false: always overwrite with the live topic, even herdr-deck's own
+# `herdr tab rename` calls (every deck it creates renames its tabs, which
+# otherwise permanently locks them out of live topic syncing). Trade-off:
+# a tab you rename by hand also gets overwritten on the next sync.
+respect_manual_names = false

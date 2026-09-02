@@ -1,3 +1,4 @@
+onboarding = false
 # herdr configuration
 # Place this file at ~/.config/herdr/config.toml
 
@@ -66,12 +67,9 @@ focus_pane_up = ["prefix+k", "ctrl+alt+k"]
 focus_pane_right = ["prefix+l", "ctrl+alt+l"]
 previous_tab = ["prefix+p", "ctrl+alt+["]
 next_tab = ["prefix+n", "ctrl+alt+]"]
-# prefix+c/v/minus are freed up below to open herdr-deck instead of a blank
-# pane/split; ctrl+alt+ variants stay as the raw escape hatch for an actual
-# blank pane when you genuinely want one.
-new_tab = ["ctrl+alt+c"]
-split_vertical = ["ctrl+alt+d"]
-split_horizontal = ["ctrl+alt+shift+d"]
+new_tab = ["prefix+c", "ctrl+alt+c"]
+split_vertical = ["prefix+v", "ctrl+alt+d"]
+split_horizontal = ["prefix+minus", "ctrl+alt+shift+d"]
 zoom = ["prefix+z", "ctrl+alt+z"]
 
 
@@ -141,33 +139,17 @@ navigate_workspace_down = "down"
 # height = "80%"
 
 # herdr-deck (https://github.com/ctbaum/herdr-deck): workspace/worktree/session
-# picker that recreates a full nvim + agent + terminal + lazygit deck. Bound
-# as the default for every "give me a new pane" action (new tab, splits) so
-# it's the one entry point instead of a blank shell; ctrl+alt+c/d/shift+d
-# above still give a raw blank pane/split when that's actually what's wanted.
+# picker that recreates a full nvim + agent + terminal + lazygit deck.
+# herdr-deck has no headless/no-prompt mode (confirmed in its source: the
+# only args are --help/--open-link/--restore-editors/--toggle-project/
+# --record-workspace-focus, everything else always launches the interactive
+# picker), so it's a deliberate, explicit action rather than the default for
+# every new tab/split.
 [[keys.command]]
 key = "prefix+o"
 type = "plugin_action"
 command = "herdr-deck.open"
 description = "Open herdr-deck"
-
-[[keys.command]]
-key = "prefix+c"
-type = "plugin_action"
-command = "herdr-deck.open"
-description = "Open herdr-deck (new tab)"
-
-[[keys.command]]
-key = "prefix+v"
-type = "plugin_action"
-command = "herdr-deck.open"
-description = "Open herdr-deck (vertical split)"
-
-[[keys.command]]
-key = "prefix+minus"
-type = "plugin_action"
-command = "herdr-deck.open"
-description = "Open herdr-deck (horizontal split)"
 
 [[keys.command]]
 key = "alt+o"
