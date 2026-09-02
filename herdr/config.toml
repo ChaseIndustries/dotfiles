@@ -258,13 +258,17 @@ hide_tab_bar_when_single_tab = true
 # row_gap = 0
 # rows = [["state_icon", "workspace", "tab"], ["agent"]]
 # Optional canonical agent IDs replace the default rows for matching agents.
-# claude rows put the live task summary on top as a single truncated line
-# (terminal_title_stripped, not title-wrap's $title_l1..l4 multi-row wrap),
-# with the icon/workspace/tab identity row below it. herdr plugins can't ship
-# UI config themselves (see herdr-title-wrap's README), so this has to live here.
+# claude rows put the live task summary on top, wrapped across multiple rows
+# via title-wrap's $title_l1..l4 tokens (white, so it stands out from the
+# default-colored icon/workspace/tab identity row below it, which stays a
+# single line). herdr plugins can't ship UI config themselves (see
+# herdr-title-wrap's README), so this has to live here.
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  ["terminal_title_stripped"],
+  [{ token = "$title_l1", fg = "#ffffff" }],
+  [{ token = "$title_l2", fg = "#ffffff" }],
+  [{ token = "$title_l3", fg = "#ffffff" }],
+  [{ token = "$title_l4", fg = "#ffffff" }],
   ["state_icon", "workspace", "tab"],
 ]
 
