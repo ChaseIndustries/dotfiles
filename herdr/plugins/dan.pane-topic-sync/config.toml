@@ -6,7 +6,7 @@ sync_panes = true
 sync_tabs = true
 tab_source = "first"          # "first" (top-left) or "active" (last focused)
 max_label_length = 60
-tab_format = "{n}· {topic}"   # keep the tab switch number
+tab_format = "{topic} ·{n}"   # topic leads, tab switch number trails
 pane_format = "{topic}"
 
 # false: always overwrite with the live topic, even herdr-deck's own
