@@ -30,12 +30,23 @@ takes effect on existing machines too, not just fresh ones.
   path varies by machine and install method (Homebrew arm vs intel, cargo,
   `~/.local/bin`, etc). `herdr` on this machine turned out to live at
   `~/.local/bin/herdr`, not `/opt/homebrew/bin/herdr` — a script that
-  hardcoded the homebrew path was silently broken. Resolve via
-  `command -v <tool>` (PATH) first, then fall back through known install
-  locations, the way `zsh/functions.zsh`'s `_dotfiles_resolve_bin` and
+  hardcoded the homebrew path was silently broken. Resolve via `whence -p
+  <tool>` (zsh; PATH-only, ignores functions/aliases — see next gotcha)
+  first, then fall back through known install locations, the way
+  `zsh/functions.zsh`'s `_dotfiles_resolve_bin` and
   `raycast/herdr-new-workspace.sh` do it. Cursor terminal profiles and
   Raycast's silent-mode scripts don't reliably inherit a full shell `PATH`,
   which is exactly why the fallback list matters, not why hardcoding does.
+- **`command -v <name>` in zsh also matches shell functions/aliases, not
+  just PATH binaries.** If a wrapper function shadows the real command
+  (e.g. `functions.zsh`'s `herdr()` wrapper, which auto-opens herdr-deck on
+  bare `herdr` and shadows the `herdr` binary), resolving that command's
+  path with `command -v` will resolve to the function itself once it's
+  defined — and if the wrapper then calls that "resolved path", it recurses
+  into itself (`FUNCNEST` error). Bites only on re-sourcing within an
+  already-live shell, since a fresh process hasn't defined the function yet
+  at the point the resolution line runs — use `whence -p` instead, which
+  is PATH-only and immune to this.
 - **No personal/company paths baked into scripts.** Project-root defaults
   read from `HERDR_PROJECT_ROOT`, falling back to `~/projects`, not a
   hardcoded work directory. Keep it that way for any new default paths.

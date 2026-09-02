@@ -18,7 +18,9 @@ Personal shell config and utilities. No credentials — those live separately.
 
 Herdr plugins themselves are installed via `herdr plugin install <owner/repo>`. The plugin config files in `herdr/plugins/` are symlinked so the plugin picks them up.
 
-`nvim/init.lua` is a minimal config whose main job is powering the editor pane in [herdr-deck](https://github.com/ctbaum/herdr-deck) (bootstraps lazy.nvim + herdr-agents.nvim so Claude/Codex auto-start inside Herdr-managed decks). Day-to-day editing still happens in Cursor. `install.sh` installs herdr-deck's dependencies (`nvim`, `worktrunk`, `zoxide`, `eza`, `lazygit`, `rust`) and the plugin itself. Open with `prefix+o`, toggle between the last two projects with `alt+o`.
+`nvim/init.lua` is a minimal config whose main job is powering the editor pane in [herdr-deck](https://github.com/ctbaum/herdr-deck) (bootstraps lazy.nvim + herdr-agents.nvim so Claude/Codex auto-start inside Herdr-managed decks). Day-to-day editing still happens in Cursor. `install.sh` installs herdr-deck's dependencies (`nvim`, `worktrunk`, `zoxide`, `eza`, `lazygit`, `rust`) and the plugin itself.
+
+herdr-deck is the default entry point for everything: `prefix+c` (new tab), `prefix+v` / `prefix+minus` (splits), and `prefix+o` all open it; `alt+o` toggles between the last two projects. The `ctrl+alt+c` / `ctrl+alt+d` / `ctrl+alt+shift+d` direct shortcuts still give a raw blank pane/split when that's genuinely what's wanted. Bare `herdr` (launching/attaching, no subcommand) also auto-opens the picker a moment after startup — see the `herdr()` wrapper in `functions.zsh`; `herdr <subcommand>` (workspace create, plugin install, etc.) passes straight through.
 
 `worktrunk/config.toml` pins `wt`'s worktree layout to `~/Repos/.herdr-worktrees/`, matching Herdr's own `[worktrees]` directory and the `git worktree add` wrapper in `functions.zsh` — otherwise worktrees created through herdr-deck (which shells out to `wt`) would land in a different place than everything else.
 

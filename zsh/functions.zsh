@@ -5,8 +5,14 @@
 # ~/.local/bin, or wherever else it happens to live on a given machine.
 function _dotfiles_resolve_bin() {
   local name="$1"; shift
-  if command -v "$name" >/dev/null 2>&1; then
-    command -v "$name"
+  # whence -p forces a PATH-only lookup, unlike `command -v`, which in zsh
+  # also reports shell functions/aliases of the same name — a real problem
+  # once a wrapper function shadows the binary it needs to call (e.g. herdr()
+  # below), since re-sourcing this file would then resolve to itself.
+  local resolved
+  resolved="$(whence -p "$name" 2>/dev/null)"
+  if [[ -n "$resolved" ]]; then
+    echo "$resolved"
     return
   fi
   local candidate
@@ -17,6 +23,20 @@ function _dotfiles_resolve_bin() {
 
 HERDR_BIN="$(_dotfiles_resolve_bin herdr "$HOME/.local/bin/herdr" /opt/homebrew/bin/herdr /usr/local/bin/herdr "$HOME/.cargo/bin/herdr")"
 CODE_BIN="$(_dotfiles_resolve_bin code /usr/local/bin/code /opt/homebrew/bin/code "$HOME/.local/bin/code" /Applications/Cursor.app/Contents/Resources/app/bin/code)"
+
+# Bare `herdr` (no args, i.e. launching/attaching the session) auto-opens the
+# herdr-deck picker shortly after so it's the landing point instead of a
+# blank pane. `herdr <subcommand>` (workspace create, plugin install, etc.)
+# passes straight through untouched. `~/.zshenv` sources this unconditionally
+# (login or not, interactive or not), so this also intercepts the Cursor
+# "herdr" terminal profile's `exec herdr` — zsh resolves shell functions
+# before falling back to the PATH binary, even under `exec`.
+function herdr() {
+  if [[ $# -eq 0 ]]; then
+    (sleep 0.6; "$HERDR_BIN" plugin action invoke open --plugin herdr-deck >/dev/null 2>&1) &!
+  fi
+  "$HERDR_BIN" "$@"
+}
 
 # Run `code <path>` only when inside Cursor's wrapped terminal
 # (GIT_WRAPPER_CONTEXT set). Outside that context, do nothing so running these
