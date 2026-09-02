@@ -55,6 +55,16 @@ remove_zshrc_block() {
   fi
 }
 
+install_herdr_plugin() {
+  local repo="$1"
+  if ! command -v herdr >/dev/null 2>&1; then
+    echo "  skipping herdr plugin $repo (herdr not installed)"
+    return
+  fi
+  echo "  installing herdr plugin: $repo"
+  herdr plugin install "$repo" --yes >/dev/null
+}
+
 unlink_file() {
   local dst="$1"
 
@@ -105,6 +115,9 @@ cmd_install() {
     brew install rust
   fi
 
+  install_herdr_plugin "danbuhler/herdr-pane-topic-sync"
+  install_herdr_plugin "T0mSIlver/herdr-title-wrap"
+
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"
   link "$DOTFILES_DIR/herdr/config.toml"                          "$HOME/.config/herdr/config.toml"
@@ -125,6 +138,10 @@ cmd_install() {
     herdr plugin install ctbaum/herdr-deck --yes || echo "  (run manually once herdr is running: herdr plugin install ctbaum/herdr-deck)"
   fi
 
+  if command -v herdr >/dev/null 2>&1 && [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
+    echo "  reloading herdr config"
+    herdr server reload-config >/dev/null || true
+  fi
   echo "Done."
 }
 
