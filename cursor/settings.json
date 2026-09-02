@@ -8,7 +8,7 @@
   "editor.minimap.enabled": true,
   "editor.formatOnSave": true,
   "workbench.activityBar.orientation": "vertical",
-  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+  "python.defaultInterpreterPath": "python3",
   "claudeCode.preferredLocation": "panel",
   "git.showCursorWorktrees": true,
   "git.autoRepositoryDetection": true,
@@ -81,13 +81,7 @@
     },
     "herdr": {
       "path": "zsh",
-      "args": ["-l", "-c", "exec /opt/homebrew/bin/herdr"],
-      "env": {
-        "GIT_WRAPPER_CONTEXT": "herdr",
-      },
-    },
-    "herdr-new-pane": {
-      "path": "${env:HOME}/bin/herdr-new-pane",
+      "args": ["-l", "-c", "exec herdr"],
       "env": {
         "GIT_WRAPPER_CONTEXT": "herdr",
       },
@@ -96,10 +90,9 @@
   "python-envs.terminal.showActivateButton": true,
   "python-envs.terminal.autoActivationType": "shellStartup",
   "git.ignoreMissingGitWarning": true,
-  "git.path": "/opt/homebrew/bin/git",
+  "git.path": "git",
   "git.terminalAuthentication": true,
   "biome.requireConfiguration": true,
-  "biome.lsp.bin": "opt/homebrew/bin/biome",
   "window.autoDetectColorScheme": false,
   "githubPullRequests.notifications": "pullRequests",
   "githubPullRequests.pushBranch": "always",

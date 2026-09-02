@@ -12,16 +12,19 @@ Personal shell config and utilities. No credentials — those live separately.
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `cursor/settings.json`                          | `~/Library/Application Support/Cursor/User/settings.json`        |
 | `cursor/keybindings.json`                       | `~/Library/Application Support/Cursor/User/keybindings.json`     |
-| `bin/herdr-new-pane`                            | `~/bin/herdr-new-pane`                                           |
 | `raycast/herdr-new-workspace.sh`                | `~/raycast-scripts/herdr-new-workspace.sh`                       |
+| `nvim/init.lua`                                 | `~/.config/nvim/init.lua`                                        |
+| `worktrunk/config.toml`                         | `~/.config/worktrunk/config.toml`                                |
 
 Herdr plugins themselves are installed via `herdr plugin install <owner/repo>`. The plugin config files in `herdr/plugins/` are symlinked so the plugin picks them up.
+
+`nvim/init.lua` is a minimal config whose main job is powering the editor pane in [herdr-deck](https://github.com/ctbaum/herdr-deck) (bootstraps lazy.nvim + herdr-agents.nvim so Claude/Codex auto-start inside Herdr-managed decks). Day-to-day editing still happens in Cursor. `install.sh` installs herdr-deck's dependencies (`nvim`, `worktrunk`, `zoxide`, `eza`, `lazygit`, `rust`) and the plugin itself. Open with `prefix+o`, toggle between the last two projects with `alt+o`.
+
+`worktrunk/config.toml` pins `wt`'s worktree layout to `~/Repos/.herdr-worktrees/`, matching Herdr's own `[worktrees]` directory and the `git worktree add` wrapper in `functions.zsh` — otherwise worktrees created through herdr-deck (which shells out to `wt`) would land in a different place than everything else.
 
 `install.sh` also adds a marked block to `~/.zshrc` that puts `~/bin` on
-`PATH` and sources `functions.zsh` (not itself a tracked file, edited in
-place).
-
-Herdr plugins themselves are installed via `herdr plugin install <owner/repo>`. The plugin config files in `herdr/plugins/` are symlinked so the plugin picks them up.
+`PATH`, sources `functions.zsh`, and initializes `zoxide` (not itself a
+tracked file, edited in place).
 
 ## Install
 

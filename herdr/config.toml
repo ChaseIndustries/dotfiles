@@ -137,6 +137,20 @@ navigate_workspace_down = "down"
 # width = "80%"
 # height = "80%"
 
+# herdr-deck (https://github.com/ctbaum/herdr-deck): workspace/worktree/session
+# picker that recreates a full nvim + agent + terminal + lazygit deck.
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "herdr-deck.open"
+description = "Open herdr-deck"
+
+[[keys.command]]
+key = "alt+o"
+type = "plugin_action"
+command = "herdr-deck.toggle-project"
+description = "Toggle previous project"
+
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.
 # [keys.indexed]

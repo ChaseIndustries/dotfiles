@@ -1,14 +1,32 @@
 # --- Functions ---
 
+# Resolve a tool's absolute path once at shell startup instead of hardcoding
+# an install location, so this works across homebrew (arm/intel), cargo,
+# ~/.local/bin, or wherever else it happens to live on a given machine.
+function _dotfiles_resolve_bin() {
+  local name="$1"; shift
+  if command -v "$name" >/dev/null 2>&1; then
+    command -v "$name"
+    return
+  fi
+  local candidate
+  for candidate in "$@"; do
+    [[ -x "$candidate" ]] && { echo "$candidate"; return; }
+  done
+}
+
+HERDR_BIN="$(_dotfiles_resolve_bin herdr "$HOME/.local/bin/herdr" /opt/homebrew/bin/herdr /usr/local/bin/herdr "$HOME/.cargo/bin/herdr")"
+CODE_BIN="$(_dotfiles_resolve_bin code /usr/local/bin/code /opt/homebrew/bin/code "$HOME/.local/bin/code" /Applications/Cursor.app/Contents/Resources/app/bin/code)"
+
 # Run `code <path>` only when inside Cursor's wrapped terminal
 # (GIT_WRAPPER_CONTEXT set). Outside that context, do nothing so running these
 # aliases from a native terminal doesn't spawn an editor unexpectedly.
 function _code_if_wrapped() {
   local path="$1"
   if [[ -f "$path" ]]; then
-    PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code "$path"
-  elif [[ -n "$GIT_WRAPPER_CONTEXT" && -x /usr/local/bin/code ]]; then
-    PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code "$path"
+    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
+  elif [[ -n "$GIT_WRAPPER_CONTEXT" && -n "$CODE_BIN" ]]; then
+    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
   else
     cd "$path"
   fi
@@ -28,12 +46,12 @@ function _worktree_navigate() {
   if [[ "$GIT_WRAPPER_CONTEXT" == "claude" ]]; then
     echo "Changing directory to $path..."
     cd "$path"
-    if [[ -x /usr/local/bin/code ]]; then
+    if [[ -n "$CODE_BIN" ]]; then
       /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
-        PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code "$path" &!
+        PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path" &!
     fi
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-      "/opt/homebrew/bin/herdr" worktree open --path "$path" --focus 2>/dev/null &!
+      "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null &!
     fi
     return 0
   fi
@@ -42,7 +60,7 @@ function _worktree_navigate() {
     local existing_workspace
     # Use worktree list (authoritative open_workspace_id) instead of pane CWD scan,
     # which was unreliable and caused duplicate workspace creation.
-    existing_workspace=$("/opt/homebrew/bin/herdr" worktree list 2>/dev/null \
+    existing_workspace=$("$HERDR_BIN" worktree list 2>/dev/null \
       | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
@@ -56,19 +74,19 @@ for wt in data.get('result', {}).get('worktrees', []):
 " "$path" 2>/dev/null)
     if [[ -n "$existing_workspace" ]]; then
       echo "Focusing existing herdr workspace $existing_workspace for $path..."
-      "/opt/homebrew/bin/herdr" workspace focus "$existing_workspace"
+      "$HERDR_BIN" workspace focus "$existing_workspace"
     else
       echo "Opening $path in new herdr workspace + Cursor..."
-      "/opt/homebrew/bin/herdr" workspace create --cwd "$path" --label "$label" --focus
+      "$HERDR_BIN" workspace create --cwd "$path" --label "$label" --focus
       /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
-        PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code --new-window "$path"
+        PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" --new-window "$path"
     fi
-  elif [[ -x /usr/local/bin/code ]]; then
+  elif [[ -n "$CODE_BIN" ]]; then
     echo "Opening $path in Cursor..."
-    PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code "$path"
+    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
     # Keep herdr command center in sync when navigating from Cursor terminal.
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-      "/opt/homebrew/bin/herdr" worktree open --path "$path" --no-focus 2>/dev/null &!
+      "$HERDR_BIN" worktree open --path "$path" --no-focus 2>/dev/null &!
     fi
   else
     echo "Changing directory to $path..."
@@ -275,7 +293,7 @@ function ibrew() {
 # Green = has an open workspace, dim = not tracked in herdr.
 function wts() {
   local raw
-  raw=$("/opt/homebrew/bin/herdr" worktree list 2>/dev/null) || { git worktree list; return; }
+  raw=$("$HERDR_BIN" worktree list 2>/dev/null) || { git worktree list; return; }
   echo "$raw" | python3 -c "
 import json, sys, os
 
@@ -318,11 +336,11 @@ function wto() {
   fi
 
   if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-    "/opt/homebrew/bin/herdr" worktree open --path "$path" --focus 2>/dev/null
+    "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null
   fi
 
-  if [[ "$GIT_WRAPPER_CONTEXT" != "claude" && -x /usr/local/bin/code ]]; then
-    PATH="/usr/local/bin:/bin:/usr/bin:$PATH" /usr/local/bin/code "$path"
+  if [[ "$GIT_WRAPPER_CONTEXT" != "claude" && -n "$CODE_BIN" ]]; then
+    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
   fi
 }
 
@@ -330,7 +348,7 @@ function wto() {
 function wtclose() {
   local branch="${1:?Usage: wtclose <branch>}"
   local ws_id
-  ws_id=$("/opt/homebrew/bin/herdr" worktree list 2>/dev/null \
+  ws_id=$("$HERDR_BIN" worktree list 2>/dev/null \
     | python3 -c "
 import json, sys
 data = json.load(sys.stdin)
@@ -348,7 +366,7 @@ for wt in data.get('result', {}).get('worktrees', []):
   fi
 
   echo "Closing herdr workspace $ws_id for $branch..."
-  "/opt/homebrew/bin/herdr" workspace close "$ws_id"
+  "$HERDR_BIN" workspace close "$ws_id"
 }
 
 alias ghco=ghco-pr

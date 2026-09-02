@@ -34,8 +34,7 @@ ZSHRC_MARKER_END="# <<< dotfiles managed block <<<"
 
 ensure_zshrc_block() {
   if [[ -f "$ZSHRC" ]] && grep -qF "$ZSHRC_MARKER_START" "$ZSHRC"; then
-    echo "  already wired: $ZSHRC"
-    return
+    sed -i '' "/^${ZSHRC_MARKER_START}\$/,/^${ZSHRC_MARKER_END}\$/d" "$ZSHRC"
   fi
 
   {
@@ -43,9 +42,10 @@ ensure_zshrc_block() {
     echo "$ZSHRC_MARKER_START"
     echo 'export PATH="$HOME/bin:$PATH"'
     echo '[ -f "$HOME/.config/zsh/functions.zsh" ] && source "$HOME/.config/zsh/functions.zsh"'
+    echo 'command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"'
     echo "$ZSHRC_MARKER_END"
   } >> "$ZSHRC"
-  echo "  wired: $ZSHRC (PATH + functions.zsh)"
+  echo "  wired: $ZSHRC (PATH + functions.zsh + zoxide)"
 }
 
 remove_zshrc_block() {
@@ -80,15 +80,51 @@ cmd_install() {
     brew install gum
   fi
 
+  if ! command -v op >/dev/null 2>&1; then
+    echo "  installing dep: 1password-cli"
+    brew install --cask 1password-cli
+  fi
+  if ! op account list >/dev/null 2>&1; then
+    echo "  1Password CLI isn't signed in yet."
+    echo "    -> 1Password app > Settings > Developer > enable 'Integrate with 1Password CLI'"
+    echo "    -> then run: op signin"
+  fi
+
+  for dep in nvim wt zoxide eza lazygit; do
+    if ! command -v "$dep" >/dev/null 2>&1; then
+      echo "  installing dep: $dep"
+      case "$dep" in
+        wt) brew install worktrunk ;;
+        nvim) brew install neovim ;;
+        *) brew install "$dep" ;;
+      esac
+    fi
+  done
+  if ! command -v cargo >/dev/null 2>&1; then
+    echo "  installing dep: rust (cargo)"
+    brew install rust
+  fi
+
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"
   link "$DOTFILES_DIR/herdr/config.toml"                          "$HOME/.config/herdr/config.toml"
   link "$DOTFILES_DIR/herdr/plugins/dan.pane-topic-sync/config.toml" "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   link "$DOTFILES_DIR/cursor/settings.json"           "$HOME/Library/Application Support/Cursor/User/settings.json"
   link "$DOTFILES_DIR/cursor/keybindings.json"        "$HOME/Library/Application Support/Cursor/User/keybindings.json"
-  link "$DOTFILES_DIR/bin/herdr-new-pane"             "$HOME/bin/herdr-new-pane"
   link "$DOTFILES_DIR/raycast/herdr-new-workspace.sh" "$HOME/raycast-scripts/herdr-new-workspace.sh"
+  link "$DOTFILES_DIR/nvim/init.lua"                  "$HOME/.config/nvim/init.lua"
+  link "$DOTFILES_DIR/worktrunk/config.toml"          "$HOME/.config/worktrunk/config.toml"
   ensure_zshrc_block
+
+  # Capture output before grepping: piping directly into `grep -q` can SIGPIPE
+  # `herdr` mid-write once grep finds its match, and with pipefail that
+  # registers as pipeline failure even though the match succeeded.
+  installed_plugins="$(herdr plugin list 2>/dev/null || true)"
+  if ! grep -q "herdr-deck" <<< "$installed_plugins"; then
+    echo "  installing herdr plugin: ctbaum/herdr-deck"
+    herdr plugin install ctbaum/herdr-deck --yes || echo "  (run manually once herdr is running: herdr plugin install ctbaum/herdr-deck)"
+  fi
+
   echo "Done."
 }
 
@@ -101,8 +137,9 @@ cmd_uninstall() {
   unlink_file "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   unlink_file "$HOME/Library/Application Support/Cursor/User/settings.json"
   unlink_file "$HOME/Library/Application Support/Cursor/User/keybindings.json"
-  unlink_file "$HOME/bin/herdr-new-pane"
   unlink_file "$HOME/raycast-scripts/herdr-new-workspace.sh"
+  unlink_file "$HOME/.config/nvim/init.lua"
+  unlink_file "$HOME/.config/worktrunk/config.toml"
   echo "Done."
 }
 
