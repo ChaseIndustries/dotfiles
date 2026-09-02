@@ -30,9 +30,9 @@ CODE_BIN="$(_dotfiles_resolve_bin code /usr/local/bin/code /opt/homebrew/bin/cod
 function _code_if_wrapped() {
   local path="$1"
   if [[ -f "$path" ]]; then
-    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
+    PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
   elif [[ -n "$GIT_WRAPPER_CONTEXT" && -n "$CODE_BIN" ]]; then
-    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
+    PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
   else
     cd "$path"
   fi
@@ -54,7 +54,7 @@ function _worktree_navigate() {
     cd "$path"
     if [[ -n "$CODE_BIN" ]]; then
       /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
-        PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path" &!
+        PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path" &!
     fi
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
       "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null &!
@@ -85,11 +85,11 @@ for wt in data.get('result', {}).get('worktrees', []):
       echo "Opening $path in new herdr workspace + Cursor..."
       "$HERDR_BIN" workspace create --cwd "$path" --label "$label" --focus
       /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
-        PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" --new-window "$path"
+        PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" --new-window "$path"
     fi
   elif [[ -n "$CODE_BIN" ]]; then
     echo "Opening $path in Cursor..."
-    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
+    PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
     # Keep herdr command center in sync when navigating from Cursor terminal.
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
       "$HERDR_BIN" worktree open --path "$path" --no-focus 2>/dev/null &!
@@ -117,7 +117,7 @@ function _worktree_checkout() {
   fi
   # --git-common-dir can be relative (e.g. ".git") when run from the repo root;
   # resolve to an absolute path so comparisons with --show-toplevel work.
-  main_root=$(cd "$(dirname "$main_git")" && pwd)
+  main_root=$(cd "${main_git:h}" && pwd)
   toplevel=$(command git rev-parse --show-toplevel 2>/dev/null)
 
   local in_main_repo=false
@@ -217,7 +217,7 @@ function git() {
       local main_git main_root toplevel
       main_git=$(command git rev-parse --git-common-dir 2>/dev/null)
       if [[ -n "$main_git" ]]; then
-        main_root=$(cd "$(dirname "$main_git")" && pwd)
+        main_root=$(cd "${main_git:h}" && pwd)
         toplevel=$(command git rev-parse --show-toplevel 2>/dev/null)
         if [[ "$toplevel" != "$main_root" ]]; then
           echo "Skipping checkout — navigating to main workspace at $main_root..."
@@ -346,7 +346,7 @@ function wto() {
   fi
 
   if [[ "$GIT_WRAPPER_CONTEXT" != "claude" && -n "$CODE_BIN" ]]; then
-    PATH="$(dirname "$CODE_BIN"):/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
+    PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
   fi
 }
 
