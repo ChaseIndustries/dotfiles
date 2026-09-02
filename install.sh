@@ -117,6 +117,9 @@ cmd_install() {
 
   install_herdr_plugin "danbuhler/herdr-pane-topic-sync"
   install_herdr_plugin "T0mSIlver/herdr-title-wrap"
+  install_herdr_plugin "nengqi/herdr-session-sync"
+  install_herdr_plugin "ubuntudroid/herdr-git-stack"
+  install_herdr_plugin "cloudmanic/herdr-plus"
 
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"

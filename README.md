@@ -17,10 +17,11 @@ Personal shell config and utilities. No credentials — those live separately.
 | `worktrunk/config.toml`                         | `~/.config/worktrunk/config.toml`                                |
 
 `install.sh` also installs the herdr plugins this config depends on
-(`danbuhler/herdr-pane-topic-sync`, `T0mSIlver/herdr-title-wrap`) via
-`herdr plugin install <owner/repo>`, skipped gracefully if herdr isn't
-installed yet. The plugin config files in `herdr/plugins/` are symlinked
-so the plugin picks them up.
+(`danbuhler/herdr-pane-topic-sync`, `T0mSIlver/herdr-title-wrap`,
+`nengqi/herdr-session-sync`, `ubuntudroid/herdr-git-stack`,
+`cloudmanic/herdr-plus`) via `herdr plugin install <owner/repo>`, skipped
+gracefully if herdr isn't installed yet. The plugin config files in
+`herdr/plugins/` are symlinked so the plugin picks them up.
 
 `nvim/init.lua` is a minimal config whose main job is powering the editor pane in [herdr-deck](https://github.com/ctbaum/herdr-deck) (bootstraps lazy.nvim + herdr-agents.nvim so Claude/Codex auto-start inside Herdr-managed decks). Day-to-day editing still happens in Cursor. `install.sh` installs herdr-deck's dependencies (`nvim`, `worktrunk`, `zoxide`, `eza`, `lazygit`, `rust`) and the plugin itself.
 
