@@ -87,6 +87,14 @@ takes effect on existing machines too, not just fresh ones.
   trade-off is a tab you rename by hand also gets overwritten on the next
   sync.
 
+## Workflow
+
+- **Land the plane: commit and push once a task here is done — no need to
+  ask each time.** Unlike work repos (which go through draft PRs and
+  require explicit confirmation before commit/push), this repo is
+  single-owner and pushes straight to `main` with no PR flow, so there's no
+  review step being skipped by committing directly.
+
 ## Checklist before changing this repo
 
 - [ ] New managed dotfile? Add matching `link` (install) and `unlink_file`
