@@ -24,6 +24,11 @@ function _dotfiles_resolve_bin() {
 HERDR_BIN="$(_dotfiles_resolve_bin herdr "$HOME/.local/bin/herdr" /opt/homebrew/bin/herdr /usr/local/bin/herdr "$HOME/.cargo/bin/herdr")"
 CODE_BIN="$(_dotfiles_resolve_bin code /usr/local/bin/code /opt/homebrew/bin/code "$HOME/.local/bin/code" /Applications/Cursor.app/Contents/Resources/app/bin/code)"
 
+# Where your actual repo checkouts live. Defaults to ~/Repos; export
+# REPOS_ROOT in your local (untracked) shell config to point it elsewhere
+# on a given machine without hardcoding a client/employer-specific path here.
+REPOS_ROOT="${REPOS_ROOT:-$HOME/Repos}"
+
 # Run `code <path>` only when inside Cursor's wrapped terminal
 # (GIT_WRAPPER_CONTEXT set). Outside that context, do nothing so running these
 # aliases from a native terminal doesn't spawn an editor unexpectedly.
@@ -194,7 +199,7 @@ function git() {
     # When inside herdr, redirect relative worktree paths to herdr's shared directory.
     # Absolute paths (e.g. already pointing at .herdr-worktrees) pass through unchanged.
     if [[ -n "$HERDR_ENV" && -n "$3" && "$3" != /* && "$3" != ~* ]]; then
-      local herdr_dir="$HOME/Repos/.herdr-worktrees"
+      local herdr_dir="$REPOS_ROOT/.herdr-worktrees"
       local repo_name wt_name new_path
       repo_name=$(basename "$(command git rev-parse --show-toplevel 2>/dev/null)")
       wt_name="${3:t}"  # basename of the requested path
@@ -236,7 +241,7 @@ function git() {
 }
 
 function _gh_repo_to_path() {
-  echo "$HOME/Repos/$1"
+  echo "$REPOS_ROOT/$1"
 }
 
 # Check out a PR from any directory, routing through the main repo workspace.
