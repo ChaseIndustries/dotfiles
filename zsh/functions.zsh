@@ -52,15 +52,13 @@ function _worktree_navigate() {
     echo "Not a directory: $path" >&2
     return 1
   fi
-  # Claude Code: cd, open in Cursor, and sync herdr — all three.
+  # Claude Code: cd and sync herdr, but deliberately skip opening Cursor —
+  # a Claude session should keep its work in its own context/terminal
+  # rather than yanking focus into a new editor window.
   # Must come before HERDR_ENV check because HERDR_ENV=1 is inherited from Cursor.
   if [[ "$GIT_WRAPPER_CONTEXT" == "claude" ]]; then
     echo "Changing directory to $path..."
     cd "$path"
-    if [[ -n "$CODE_BIN" ]]; then
-      /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
-        PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path" &!
-    fi
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
       "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null &!
     fi
@@ -275,7 +273,9 @@ function ghco-pr() {
     | command awk -v want="refs/heads/$branch" 'BEGIN{wt=""} /^worktree / {wt=$2} /^branch / {if ($2==want) {print wt; exit}}')
   if [[ -n "$existing_worktree" && -d "$existing_worktree" ]]; then
     echo "PR branch already checked out in worktree at $existing_worktree"
-    _worktree_navigate "$existing_worktree"
+    # Just cd — don't auto-open Cursor here, it's redundant with a
+    # multiplexer. Run `code .` yourself if you want the editor.
+    cd "$existing_worktree"
     return 0
   fi
 
@@ -378,6 +378,88 @@ for wt in data.get('result', {}).get('worktrees', []):
 
   echo "Closing herdr workspace $ws_id for $branch..."
   "$HERDR_BIN" workspace close "$ws_id"
+}
+
+# List worktrees that look safe to remove: branch is merged into the repo's
+# default branch, or its upstream is gone (typical after a squash-merge with
+# delete-branch-on-merge). Worktrees with uncommitted changes or an open
+# herdr workspace are reported but never touched. Dry-run by default; pass
+# --force to actually remove.
+function wtclean() {
+  local force=0
+  [[ "$1" == "--force" || "$1" == "-f" ]] && force=1
+
+  local main_git main_root
+  main_git=$(command git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+    echo "Not a git repository" >&2
+    return 1
+  }
+  main_root="${main_git:h}"
+
+  local default_branch
+  default_branch=$(command git -C "$main_root" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')
+  [[ -z "$default_branch" ]] && default_branch=$(command git -C "$main_root" branch --list main master | sed 's/^[* ] //' | head -1)
+  [[ -z "$default_branch" ]] && default_branch="main"
+
+  local merged_branches gone_branches herdr_open
+  merged_branches=$(command git -C "$main_root" branch --format='%(refname:short)' --merged "$default_branch")
+  gone_branches=$(command git -C "$main_root" for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads | awk '/\[gone\]/{print $1}')
+  herdr_open=$("$HERDR_BIN" worktree list 2>/dev/null | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    data = {}
+for wt in data.get('result', {}).get('worktrees', []):
+    if wt.get('open_workspace_id'):
+        print(wt.get('branch', ''))
+" 2>/dev/null)
+
+  local removed=0 candidates=0
+  local wt_path wt_branch
+  while IFS=$'\t' read -r wt_path wt_branch; do
+    [[ -z "$wt_branch" || "$wt_path" == "$main_root" || "$wt_branch" == "$default_branch" ]] && continue
+
+    local is_merged=0 is_gone=0
+    print -r -- "$merged_branches" | grep -qxF "$wt_branch" && is_merged=1
+    print -r -- "$gone_branches" | grep -qxF "$wt_branch" && is_gone=1
+    [[ $is_merged -eq 0 && $is_gone -eq 0 ]] && continue
+
+    local reason="merged into $default_branch"
+    [[ $is_gone -eq 1 ]] && reason="upstream gone"
+
+    if [[ -n $(command git -C "$wt_path" status --porcelain 2>/dev/null) ]]; then
+      echo "SKIP  $wt_branch ($reason) — uncommitted changes in $wt_path"
+      continue
+    fi
+    if print -r -- "$herdr_open" | grep -qxF "$wt_branch"; then
+      echo "SKIP  $wt_branch ($reason) — open herdr workspace, run: wtclose $wt_branch"
+      continue
+    fi
+
+    candidates=$((candidates + 1))
+    if [[ $force -eq 1 ]]; then
+      echo "REMOVE $wt_branch ($reason)"
+      command git -C "$main_root" worktree remove "$wt_path" && {
+        if [[ $is_merged -eq 1 ]]; then
+          command git -C "$main_root" branch -d "$wt_branch"
+        else
+          command git -C "$main_root" branch -D "$wt_branch"
+        fi
+        removed=$((removed + 1))
+      }
+    else
+      echo "WOULD REMOVE  $wt_branch ($reason) — $wt_path"
+    fi
+  done < <(command git -C "$main_root" worktree list --porcelain | awk '/^worktree /{path=$2} /^branch /{branch=$2; sub("refs/heads/", "", branch); print path"\t"branch}')
+
+  if [[ $force -eq 1 ]]; then
+    echo "Removed $removed worktree(s)."
+  elif [[ $candidates -gt 0 ]]; then
+    echo "$candidates worktree(s) eligible for removal. Re-run with --force to remove them."
+  else
+    echo "No stale worktrees found."
+  fi
 }
 
 alias ghco=ghco-pr
