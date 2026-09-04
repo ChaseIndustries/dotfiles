@@ -180,12 +180,13 @@ description = "New dual-pane workspace (claude + zsh)"
 # workspaces = "" # e.g. "ctrl+shift" makes ctrl+shift+1..9 switch workspaces directly
 # agents = ""     # e.g. "alt" makes alt+1..9 focus agent rows directly
 
-# Colocated with primary repo checkouts on this machine. herdr's TOML config
-# has no env-var expansion (only ~), unlike the git-worktree-add wrapper in
-# zsh/functions.zsh (uses $REPOS_ROOT), so this path is hardcoded rather than
-# parameterized. Update it directly if repos move on a given machine.
+# herdr's TOML config has no env-var expansion (only ~), so this stays a
+# generic literal ~/Repos path rather than a machine/employer-specific one.
+# install.sh symlinks ~/Repos -> $REPOS_ROOT when that env var is set to
+# something other than ~/Repos itself, so this resolves correctly wherever
+# repos actually live on a given machine.
 [worktrees]
-directory = "~/Klaviyo/Repos/.herdr-worktrees/"
+directory = "~/Repos/.herdr-worktrees/"
 
 [ui]
 # Sidebar width (auto-scaled based on workspace names, this sets the default)

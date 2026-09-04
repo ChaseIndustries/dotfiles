@@ -55,6 +55,35 @@ remove_zshrc_block() {
   fi
 }
 
+ensure_repos_root_symlink() {
+  local target="${REPOS_ROOT:-}"
+  local link_path="$HOME/Repos"
+
+  # Unset or pointing at the default itself: nothing to do, tools already
+  # hardcode ~/Repos as their literal default.
+  [[ -z "$target" || "$target" == "$link_path" ]] && return
+
+  if [[ -L "$link_path" ]]; then
+    local current
+    current="$(readlink "$link_path")"
+    if [[ "$current" == "$target" ]]; then
+      echo "  already linked: $link_path -> $target"
+    else
+      echo "  replacing stale symlink: $link_path -> $current"
+      rm "$link_path"
+      ln -s "$target" "$link_path"
+      echo "  linked: $link_path -> $target"
+    fi
+  elif [[ -e "$link_path" ]]; then
+    echo "  skipping: $link_path already exists as a real directory."
+    echo "    herdr/worktrunk hardcode ~/Repos/... as their worktree pool; REPOS_ROOT=$target won't take effect there"
+    echo "    until you migrate its contents (e.g. via 'git worktree move' for each worktree) and replace it with a symlink yourself."
+  else
+    ln -s "$target" "$link_path"
+    echo "  linked: $link_path -> $target"
+  fi
+}
+
 install_herdr_plugin() {
   local repo="$1"
   if ! command -v herdr >/dev/null 2>&1; then
@@ -114,6 +143,8 @@ cmd_install() {
     echo "  installing dep: rust (cargo)"
     brew install rust
   fi
+
+  ensure_repos_root_symlink
 
   install_herdr_plugin "danbuhler/herdr-pane-topic-sync"
   install_herdr_plugin "T0mSIlver/herdr-title-wrap"

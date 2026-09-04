@@ -5,8 +5,8 @@
 # and the git-worktree-add wrapper in zsh/functions.zsh, so a worktree
 # created through any of the three (Herdr's own new_worktree action, the
 # git wrapper, or herdr-deck via wt) always lands in the same place.
-# worktrunk's template engine has no env-var expansion (only ~), so this is
-# hardcoded rather than parameterized like $REPOS_ROOT in functions.zsh.
-# The git wrapper only matches this automatically if $REPOS_ROOT is exported
-# to the same directory in your local (untracked) shell config.
-worktree-path = "~/Klaviyo/Repos/.herdr-worktrees/{{ repo }}-{{ branch | sanitize }}"
+# worktrunk's template engine has no env-var expansion (only ~), so this
+# stays a generic literal ~/Repos path. install.sh symlinks ~/Repos ->
+# $REPOS_ROOT when that env var points elsewhere, so it resolves correctly
+# per machine without hardcoding an employer-specific path here.
+worktree-path = "~/Repos/.herdr-worktrees/{{ repo }}-{{ branch | sanitize }}"
