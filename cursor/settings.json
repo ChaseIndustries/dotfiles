@@ -70,15 +70,6 @@
     },
     "JavaScript Debug Terminal": null,
     "bash": null,
-    "claude": {
-      "path": "zsh",
-      "args": ["-l", "-c", "exec claude"],
-      "color": "terminal.ansiYellow",
-      "icon": "robot",
-      "env": {
-        "GIT_WRAPPER_CONTEXT": "claude",
-      },
-    },
     "herdr": {
       "path": "zsh",
       "args": ["-l", "-c", "exec herdr"],

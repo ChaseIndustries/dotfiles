@@ -52,6 +52,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "opus[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "WorktreeCreate": [
@@ -83,6 +84,16 @@
             "command": "bd prime --stealth"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/herdr-agent-state.sh\" session",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
@@ -100,7 +111,7 @@
     "linear@claude-plugins-official": true,
     "remember@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
@@ -109,7 +120,7 @@
   "skipDangerousModePermissionPrompt": true,
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "agentPushNotifEnabled": true
+  "voiceEnabled": true
 }
