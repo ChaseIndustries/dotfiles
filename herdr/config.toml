@@ -72,6 +72,12 @@ split_vertical = ["prefix+v", "ctrl+alt+d"]
 split_horizontal = ["prefix+minus", "ctrl+alt+shift+d"]
 zoom = ["prefix+z", "ctrl+alt+z"]
 
+# Disabled in favor of the [[keys.command]] below: plain "new workspace"
+# should get a dual-pane layout (claude on top, plain zsh below) instead of
+# a single empty pane. New git worktrees get the same shape automatically
+# via the cloudmanic.herdr-plus wildcard worktree layout (no keybinding
+# needed for those - see ~/.config/herdr/plugins/config/cloudmanic.herdr-plus/worktrees/dual-pane.toml).
+new_workspace = ""
 
 # Prefix-mode actions
 # help = "prefix+?"
@@ -156,6 +162,16 @@ key = "alt+o"
 type = "plugin_action"
 command = "herdr-deck.toggle-project"
 description = "Toggle previous project"
+
+# Replaces the built-in new_workspace action (disabled above): a plain new
+# workspace should come up with claude on top and a plain zsh shell below,
+# not a single empty pane. Script lives in dotfiles/herdr/scripts and is
+# symlinked onto PATH by install.sh.
+[[keys.command]]
+key = "prefix+shift+n"
+type = "shell"
+command = "herdr-new-dual-workspace"
+description = "New dual-pane workspace (claude + zsh)"
 
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.

@@ -9,11 +9,11 @@
 # @raycast.icon 🤖
 # @raycast.packageName Herdr
 
-HERDR_BIN=$(command -v herdr)
-for candidate in "$HOME/.local/bin/herdr" /opt/homebrew/bin/herdr /usr/local/bin/herdr "$HOME/.cargo/bin/herdr"; do
-  [ -z "$HERDR_BIN" ] && [ -x "$candidate" ] && HERDR_BIN="$candidate"
+SCRIPT_BIN=$(command -v herdr-new-dual-workspace)
+for candidate in "$HOME/.local/bin/herdr-new-dual-workspace"; do
+  [ -z "$SCRIPT_BIN" ] && [ -x "$candidate" ] && SCRIPT_BIN="$candidate"
 done
-[ -z "$HERDR_BIN" ] && { echo "herdr not found" >&2; exit 1; }
+[ -z "$SCRIPT_BIN" ] && { echo "herdr-new-dual-workspace not found" >&2; exit 1; }
 
-"$HERDR_BIN" workspace create --focus --cwd "${HERDR_PROJECT_ROOT:-$HOME/projects}"
+"$SCRIPT_BIN" "${HERDR_PROJECT_ROOT:-$HOME/projects}"
 osascript -e 'tell application "System Events" to set frontmost of (first process whose name contains "herdr") to true' 2>/dev/null || true

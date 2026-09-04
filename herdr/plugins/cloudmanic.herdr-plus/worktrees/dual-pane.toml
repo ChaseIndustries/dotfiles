@@ -1,0 +1,16 @@
+# Wildcard herdr-plus worktree auto-layout: applies to every repo that
+# doesn't have its own more specific layout. Fires automatically the moment
+# herdr creates or opens a git worktree - no keybinding needed.
+#
+# Layout: top pane runs Claude, bottom pane (~20% height) is a plain shell.
+repo = "*"
+
+[[tabs]]
+name = "main"
+
+[[tabs.panes]]
+command = "claude"
+
+[[tabs.panes]]
+split = "down"
+ratio = 0.2
