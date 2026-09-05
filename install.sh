@@ -151,6 +151,7 @@ cmd_install() {
   install_herdr_plugin "nengqi/herdr-session-sync"
   install_herdr_plugin "ubuntudroid/herdr-git-stack"
   install_herdr_plugin "cloudmanic/herdr-plus"
+  install_herdr_plugin "thuanlm215/herdr-grid"
 
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"

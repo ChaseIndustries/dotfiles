@@ -19,13 +19,16 @@ Personal shell config and utilities. No credentials — those live separately.
 `install.sh` also installs the herdr plugins this config depends on
 (`danbuhler/herdr-pane-topic-sync`, `T0mSIlver/herdr-title-wrap`,
 `nengqi/herdr-session-sync`, `ubuntudroid/herdr-git-stack`,
-`cloudmanic/herdr-plus`) via `herdr plugin install <owner/repo>`, skipped
-gracefully if herdr isn't installed yet. The plugin config files in
-`herdr/plugins/` are symlinked so the plugin picks them up.
+`cloudmanic/herdr-plus`, `thuanlm215/herdr-grid`) via
+`herdr plugin install <owner/repo>`, skipped gracefully if herdr isn't
+installed yet. The plugin config files in `herdr/plugins/` are symlinked
+so the plugin picks them up.
 
 `nvim/init.lua` is a minimal config whose main job is powering the editor pane in [herdr-deck](https://github.com/ctbaum/herdr-deck) (bootstraps lazy.nvim + herdr-agents.nvim so Claude/Codex auto-start inside Herdr-managed decks). Day-to-day editing still happens in Cursor. `install.sh` installs herdr-deck's dependencies (`nvim`, `worktrunk`, `zoxide`, `eza`, `lazygit`, `rust`) and the plugin itself.
 
 Open herdr-deck explicitly with `prefix+o`; `alt+o` toggles between the last two projects. It's not the default for new tabs/splits/launch — its binary has no headless mode (only `--open-link`/`--restore-editors`/`--toggle-project`/`--record-workspace-focus`; anything else always launches its interactive picker), so forcing it onto every new pane means an unavoidable popup + manual pick every time. `new_tab`/`split_vertical`/`split_horizontal` stay plain blank panes.
+
+`prefix+t` opens [herdr-grid](https://github.com/thuanlm215/herdr-grid), a popup layout editor for the active tab: drag a pane onto another to swap them, drop on an edge to create a split, drag dividers to resize. Herdr itself only does border-drag resizing and a right-click `Split right`/`Split down` menu, so this covers the mouse gestures it lacks. The preview is committed on `Enter`, so live PTYs and scrollback survive.
 
 `worktrunk/config.toml` pins `wt`'s worktree layout to `~/Repos/.herdr-worktrees/`, matching Herdr's own `[worktrees]` directory and the `git worktree add` wrapper in `functions.zsh` — otherwise worktrees created through herdr-deck (which shells out to `wt`) would land in a different place than everything else.
 

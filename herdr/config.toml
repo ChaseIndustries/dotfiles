@@ -163,6 +163,16 @@ type = "plugin_action"
 command = "herdr-deck.toggle-project"
 description = "Toggle previous project"
 
+# herdr-grid (https://github.com/thuanlm215/herdr-grid): popup layout editor
+# for the active tab. Drag a pane onto another to swap them, drop on an edge to
+# create a split, drag dividers to resize. The preview is only committed on
+# Enter, so live PTYs and scrollback survive.
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "herdr-grid.open"
+description = "Open herdr-grid layout editor"
+
 # Replaces the built-in new_workspace action (disabled above): a plain new
 # workspace should come up with claude on top and a plain zsh shell below,
 # not a single empty pane. Script lives in dotfiles/herdr/scripts and is
