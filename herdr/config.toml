@@ -61,6 +61,18 @@ onboarding = false
 # Named punctuation such as minus, comma, ampersand, plus, and backtick is also accepted.
 # Most reliable direct bindings are ctrl+letter, function keys, and explicit modified chords.
 # alt+..., cmd/super, and punctuation-with-modifiers may depend on your terminal/tmux setup.
+
+# Not the default ctrl+b: Claude Code binds ctrl+b to background a running
+# Bash tool call, and its docs call out the same clash for tmux users (press
+# it twice to get a literal one through). Claude runs in most panes here, so
+# the prefix moves out of its way. ctrl+space is free in Claude Code and is
+# only readline's set-mark in a shell.
+# macOS caveat: with more than one keyboard layout enabled, the system's
+# "select previous input source" shortcut is ctrl+space and swallows this
+# before herdr sees it. Keep exactly one layout in Settings > Keyboard >
+# Text Input, or clear that shortcut under Keyboard Shortcuts > Input Sources.
+prefix = "ctrl+space"
+
 focus_pane_left = ["prefix+h", "ctrl+alt+h"]
 focus_pane_down = ["prefix+j", "ctrl+alt+j"]
 focus_pane_up = ["prefix+k", "ctrl+alt+k"]
@@ -71,6 +83,11 @@ new_tab = ["prefix+c", "ctrl+alt+c"]
 split_vertical = ["prefix+v", "ctrl+alt+d"]
 split_horizontal = ["prefix+minus", "ctrl+alt+shift+d"]
 zoom = ["prefix+z", "ctrl+alt+z"]
+# Direct chords for the rest of the prefix-only actions, so prefix mode stays
+# optional rather than load-bearing.
+workspace_picker = ["prefix+w", "ctrl+alt+w"]
+settings = ["prefix+s", "ctrl+alt+s"]
+resize_mode = ["prefix+r", "ctrl+alt+r"]
 
 # Disabled in favor of the [[keys.command]] below: plain "new workspace"
 # should get a dual-pane layout (claude on top, plain zsh below) instead of
@@ -152,7 +169,7 @@ navigate_workspace_down = "down"
 # picker), so it's a deliberate, explicit action rather than the default for
 # every new tab/split.
 [[keys.command]]
-key = "prefix+o"
+key = ["prefix+o", "ctrl+alt+o"]
 type = "plugin_action"
 command = "herdr-deck.open"
 description = "Open herdr-deck"
@@ -168,7 +185,7 @@ description = "Toggle previous project"
 # create a split, drag dividers to resize. The preview is only committed on
 # Enter, so live PTYs and scrollback survive.
 [[keys.command]]
-key = "prefix+t"
+key = ["prefix+t", "ctrl+alt+g"]
 type = "plugin_action"
 command = "herdr-grid.open"
 description = "Open herdr-grid layout editor"
