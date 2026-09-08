@@ -10,7 +10,6 @@ Personal shell config and utilities. No credentials — those live separately.
 | `claude/settings.json`                          | `~/.claude/settings.json`                                        |
 | `herdr/config.toml`                             | `~/.config/herdr/config.toml`                                    |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
-| `herdr/plugins/pane-topic-sync-fork/`           | linked in place via `herdr plugin link` (not symlinked)          |
 | `cursor/settings.json`                          | `~/Library/Application Support/Cursor/User/settings.json`        |
 | `cursor/keybindings.json`                       | `~/Library/Application Support/Cursor/User/keybindings.json`     |
 | `raycast/herdr-new-workspace.sh`                | `~/raycast-scripts/herdr-new-workspace.sh`                       |
@@ -18,19 +17,20 @@ Personal shell config and utilities. No credentials — those live separately.
 | `worktrunk/config.toml`                         | `~/.config/worktrunk/config.toml`                                |
 
 `install.sh` also installs the herdr plugins this config depends on
-(`T0mSIlver/herdr-title-wrap`, `ubuntudroid/herdr-git-stack`,
-`cloudmanic/herdr-plus`, `thuanlm215/herdr-grid`) via
+(`danbuhler/herdr-pane-topic-sync`, `T0mSIlver/herdr-title-wrap`,
+`ubuntudroid/herdr-git-stack`, `cloudmanic/herdr-plus`,
+`thuanlm215/herdr-grid`) via
 `herdr plugin install <owner/repo>`, skipped gracefully if herdr isn't
 installed yet. The plugin config files in `herdr/plugins/` are symlinked
 so the plugin picks them up.
 
-Pane Topic Sync is the exception: `herdr/plugins/pane-topic-sync-fork/` is a
-patched copy of `danbuhler/herdr-pane-topic-sync`, registered with `herdr
-plugin link` rather than installed from GitHub. The patch splits the plugin's
-one `respect_manual_names` flag into `respect_manual_pane_names` and
-`respect_manual_tab_names`, so a pane named by hand keeps its name while live
-topics still win over herdr-deck's tab renames. A linked checkout can't be
-overwritten by a plugin update the way a patched GitHub install would be.
+Pane Topic Sync runs with `sync_panes = false`, so it names tabs only. Its
+single `respect_manual_names` flag covers panes and tabs together, and the two
+need opposite policies here: live topics have to win for tabs (herdr-deck
+renames every tab it creates, which would otherwise lock them out of topic
+syncing), while a pane named by hand has to survive. Managing tabs only settles
+it, since nothing then writes pane labels at all. Pane borders fall back to
+herdr's own agent label via `show_agent_labels_on_pane_borders`.
 
 `nengqi/herdr-session-sync` is deliberately absent. It renamed every pane from
 the foreground process or PTY title with no manual-name check at all, so
