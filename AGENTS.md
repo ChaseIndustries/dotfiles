@@ -94,8 +94,9 @@ takes effect on existing machines too, not just fresh ones.
   `~/.config/herdr/plugins/github/<repo>-<hash>/`, so a plugin update swaps
   in a fresh unpatched copy and hand-named panes silently start getting
   clobbered again. Hand a pane back to live topic syncing with `herdr pane
-  rename <id> --clear`. If upstream ever adds per-kind flags, drop the fork
-  and go back to `install_herdr_plugin`.
+  rename <id> --clear`. Filed upstream as
+  [danbuhler/herdr-pane-topic-sync#7](https://github.com/danbuhler/herdr-pane-topic-sync/issues/7);
+  if it lands, drop the fork and go back to `install_herdr_plugin`.
 - **`sync_panes = false` is NOT a fork-free substitute — a pane border has no
   live-topic fallback.** Tried it (8c0c34d, reverted): let the plugin manage
   tabs only, so nothing writes pane labels and hand-named panes survive for
