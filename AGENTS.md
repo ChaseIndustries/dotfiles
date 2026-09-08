@@ -12,6 +12,7 @@ config immediately. No build step, no deploy step.
 | `claude/settings.json` | `~/.claude/settings.json` |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
+| `herdr/plugins/pane-topic-sync-fork/` | registered in place by `herdr plugin link` — not symlinked |
 | `cursor/settings.json` | `~/Library/Application Support/Cursor/User/settings.json` |
 | `cursor/keybindings.json` | `~/Library/Application Support/Cursor/User/keybindings.json` |
 | `raycast/herdr-new-workspace.sh` | `~/raycast-scripts/herdr-new-workspace.sh` |
@@ -79,13 +80,38 @@ takes effect on existing machines too, not just fresh ones.
   forced popup + manual pick every time. Keep it on an explicit key
   (`prefix+o`) only.
 - **herdr-deck's `herdr tab rename` calls fight `pane-topic-sync`'s
-  `respect_manual_names`.** Every deck herdr-deck creates renames its own
-  tabs explicitly; with `respect_manual_names = true` that permanently
-  locks those tabs out of live agent-topic syncing (static "dotfiles"/
-  "lazygit" labels instead of the live task title). Set it `false` if you
-  want live topics to keep winning even over herdr-deck's renames — the
-  trade-off is a tab you rename by hand also gets overwritten on the next
-  sync.
+  `respect_manual_names`, and upstream's single flag can't separate the two
+  cases.** Every deck herdr-deck creates renames its own tabs explicitly;
+  with `respect_manual_names = true` that permanently locks those tabs out
+  of live agent-topic syncing (static "dotfiles"/"lazygit" labels instead of
+  the live task title). Setting it `false` fixes the tabs but also means a
+  *pane* you name by hand gets overwritten on the next sync, which is a
+  different problem — the flag covers panes and tabs together.
+  `herdr/plugins/pane-topic-sync-fork/` is a patched copy that splits it into
+  `respect_manual_pane_names` (true here) and `respect_manual_tab_names`
+  (false here), registered with `herdr plugin link` instead of `herdr plugin
+  install`. Link, don't patch-in-place: the GitHub install lives under
+  `~/.config/herdr/plugins/github/<repo>-<hash>/`, so a plugin update swaps
+  in a fresh unpatched copy and hand-named panes silently start getting
+  clobbered again. Hand a pane back to live topic syncing with `herdr pane
+  rename <id> --clear`. If upstream ever adds per-kind flags, drop the fork
+  and go back to `install_herdr_plugin`.
+- **A herdr plugin that renames panes with no manual-name check will fight
+  every other one.** `nengqi/herdr-session-sync` renamed every pane from the
+  foreground process, then the PTY title, then the cwd basename, gated only
+  on `if current_label != target_title` — no ownership state, no manual
+  check. It fires on `pane.agent_status_changed`, which flips constantly
+  while an agent works, so hand-named panes reverted within seconds (SSH
+  panes labeled `prod`/`prod_eu` became `ubuntu@qw-on-demand-micro-...`).
+  Worse, its writes made `pane-topic-sync` see labels it didn't own and back
+  off those panes entirely. Disabled with `herdr plugin disable session-sync`
+  (still installed, so re-enabling is one command if its Heeler mobile-companion
+  half is ever wanted) and dropped from `install.sh` so a fresh machine doesn't
+  reintroduce it enabled. When pane or tab labels misbehave,
+  check *how many* plugins claim them: `grep 'method="pane.rename"'
+  ~/.config/herdr/herdr-server.log | grep -o 'request_id="[^":]*'  | sort |
+  uniq -c` attributes the writes (`cli` = a plugin shelling out to the herdr
+  CLI, `sync` = session-sync's direct RPC).
 
 ## Workflow
 

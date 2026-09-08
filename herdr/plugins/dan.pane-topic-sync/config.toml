@@ -1,5 +1,6 @@
 # Pane Topic Sync plugin config
-# Source: https://github.com/danbuhler/herdr-pane-topic-sync
+# Upstream: https://github.com/danbuhler/herdr-pane-topic-sync
+# Running a local fork: herdr/plugins/pane-topic-sync-fork (see AGENTS.md).
 # Auto-names panes/tabs from the live agent topic (terminal_title_stripped).
 
 sync_panes = true
@@ -9,8 +10,18 @@ max_label_length = 60
 tab_format = "{topic} ·{n}"   # topic leads, tab switch number trails
 pane_format = "{topic}"
 
-# false: always overwrite with the live topic, even herdr-deck's own
-# `herdr tab rename` calls (every deck it creates renames its tabs, which
-# otherwise permanently locks them out of live topic syncing). Trade-off:
-# a tab you rename by hand also gets overwritten on the next sync.
+# Umbrella flag. Only read for kinds left unset below, so here it just keeps
+# stock upstream behaving the way it did before the fork if the fork is ever
+# swapped back out.
 respect_manual_names = false
+
+# Panes: a pane you name by hand keeps that name. Hand it back to live topic
+# syncing with `herdr pane rename <id> --clear`.
+respect_manual_pane_names = true
+
+# Tabs: live topics always win, even over herdr-deck's own `herdr tab rename`
+# calls. Every deck it creates renames its tabs, and respecting those would
+# permanently lock them out of topic syncing (static "dotfiles"/"lazygit"
+# labels instead of the live task title). Trade-off: a tab you rename by hand
+# gets overwritten on the next sync.
+respect_manual_tab_names = false
