@@ -1,35 +1,27 @@
 # Pane Topic Sync plugin config
-# Source: https://github.com/danbuhler/herdr-pane-topic-sync
-# Names TABS from the live agent topic (terminal_title_stripped). Pane naming
-# is off on purpose -- see below.
+# Upstream: https://github.com/danbuhler/herdr-pane-topic-sync
+# Running a local fork: herdr/plugins/pane-topic-sync-fork (see AGENTS.md).
+# Auto-names panes/tabs from the live agent topic (terminal_title_stripped).
 
-# Tabs only. The plugin's one respect_manual_names flag covers panes and tabs
-# together, and the two need opposite policies here (live topics must win for
-# tabs, hand-named panes must survive). Turning pane naming off resolves that
-# without patching the plugin: nothing writes pane labels, so a pane you name
-# by hand simply keeps its name.
-#
-# Nothing here reads a pane's label anyway. The claude sidebar rows use
-# title-wrap's $title_lN tokens (see herdr/config.toml), herdr-grid reads
-# terminal_title_stripped, and pane borders fall back to herdr's own agent
-# label via show_agent_labels_on_pane_borders.
-#
-# Known cost: a pane whose agent has exited reports no agent label, so its
-# border goes blank instead of keeping the last topic the plugin had written
-# there. Set sync_panes = true (and read the respect_manual_names note below)
-# if that memory turns out to be worth more than hand-named panes.
-sync_panes = false
+sync_panes = true
 sync_tabs = true
-
 tab_source = "first"          # "first" (top-left) or "active" (last focused)
 max_label_length = 60
 tab_format = "{topic} ·{n}"   # topic leads, tab switch number trails
-pane_format = "{topic}"       # unused while sync_panes = false
+pane_format = "{topic}"
+
+# Umbrella flag. Only read for kinds left unset below, so here it just keeps
+# stock upstream behaving the way it did before the fork if the fork is ever
+# swapped back out.
+respect_manual_names = false
+
+# Panes: a pane you name by hand keeps that name. Hand it back to live topic
+# syncing with `herdr pane rename <id> --clear`.
+respect_manual_pane_names = true
 
 # Tabs: live topics always win, even over herdr-deck's own `herdr tab rename`
 # calls. Every deck it creates renames its tabs, and respecting those would
 # permanently lock them out of topic syncing (static "dotfiles"/"lazygit"
 # labels instead of the live task title). Trade-off: a tab you rename by hand
-# gets overwritten on the next sync. With sync_panes = false this no longer
-# costs you hand-named panes, which is the whole point of the split above.
-respect_manual_names = false
+# gets overwritten on the next sync.
+respect_manual_tab_names = false

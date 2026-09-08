@@ -12,6 +12,7 @@ config immediately. No build step, no deploy step.
 | `claude/settings.json` | `~/.claude/settings.json` |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
+| `herdr/plugins/pane-topic-sync-fork/` | registered in place by `herdr plugin link` — not symlinked |
 | `cursor/settings.json` | `~/Library/Application Support/Cursor/User/settings.json` |
 | `cursor/keybindings.json` | `~/Library/Application Support/Cursor/User/keybindings.json` |
 | `raycast/herdr-new-workspace.sh` | `~/raycast-scripts/herdr-new-workspace.sh` |
@@ -79,26 +80,38 @@ takes effect on existing machines too, not just fresh ones.
   forced popup + manual pick every time. Keep it on an explicit key
   (`prefix+o`) only.
 - **herdr-deck's `herdr tab rename` calls fight `pane-topic-sync`'s
-  `respect_manual_names`, and that one flag covers panes and tabs together.**
-  Every deck herdr-deck creates renames its own tabs explicitly; with
-  `respect_manual_names = true` that permanently locks those tabs out of live
-  agent-topic syncing (static "dotfiles"/"lazygit" labels instead of the live
-  task title). Setting it `false` fixes the tabs but then a *pane* you name by
-  hand also gets overwritten on the next sync. The two kinds need opposite
-  policies and the plugin can't express that.
-  Resolved without patching the plugin: `sync_panes = false`, so it manages
-  tabs only. Nothing writes pane labels, so a hand-named pane just keeps its
-  name. Nothing here reads a pane's label either — the claude sidebar rows use
-  title-wrap's `$title_lN` tokens, herdr-grid reads
-  `terminal_title_stripped`, and pane borders fall back to herdr's own agent
-  label via `show_agent_labels_on_pane_borders`. **Check the label consumers
-  before reaching for a fork.** A patched fork registered via `herdr plugin
-  link` also works and was built first, but it vendors the plugin and freezes
-  it out of upstream updates to buy one config knob.
-  The cost of `sync_panes = false`: a pane whose agent has exited reports no
-  agent label, so its border goes blank instead of keeping the last topic the
-  plugin had written into the label. Set `sync_panes = true` if that memory
-  ever turns out to be worth more than hand-named panes.
+  `respect_manual_names`, and upstream's single flag can't separate the two
+  cases.** Every deck herdr-deck creates renames its own tabs explicitly;
+  with `respect_manual_names = true` that permanently locks those tabs out
+  of live agent-topic syncing (static "dotfiles"/"lazygit" labels instead of
+  the live task title). Setting it `false` fixes the tabs but also means a
+  *pane* you name by hand gets overwritten on the next sync, which is a
+  different problem — the flag covers panes and tabs together.
+  `herdr/plugins/pane-topic-sync-fork/` is a patched copy that splits it into
+  `respect_manual_pane_names` (true here) and `respect_manual_tab_names`
+  (false here), registered with `herdr plugin link` instead of `herdr plugin
+  install`. Link, don't patch-in-place: the GitHub install lives under
+  `~/.config/herdr/plugins/github/<repo>-<hash>/`, so a plugin update swaps
+  in a fresh unpatched copy and hand-named panes silently start getting
+  clobbered again. Hand a pane back to live topic syncing with `herdr pane
+  rename <id> --clear`. If upstream ever adds per-kind flags, drop the fork
+  and go back to `install_herdr_plugin`.
+- **`sync_panes = false` is NOT a fork-free substitute — a pane border has no
+  live-topic fallback.** Tried it (8c0c34d, reverted): let the plugin manage
+  tabs only, so nothing writes pane labels and hand-named panes survive for
+  free. The pane titles then stopped rendering. A pane's live topic exists
+  *only* as `terminal_title_stripped`; herdr has no field holding it as an
+  "agent label", and `show_agent_labels_on_pane_borders` falls back to the
+  detected agent name (`claude`) or a stale `pane.report_metadata` title, not
+  the topic. The live topic reaches a border only because the plugin copies it
+  into the pane label. So writing pane labels is load-bearing here even though
+  the sidebar (title-wrap's `$title_lN`) and herdr-grid
+  (`terminal_title_stripped`) both bypass them. Two more traps when reasoning
+  about this: `pane_borders` defaults to `auto`, which draws borders around
+  *split* panes only, so a `pane_count: 1` tab shows no pane title either way
+  (`always` + `ui.pane_outer_borders` frames a lone pane); and checking which
+  config *keys* mention labels is not the same as checking what actually
+  *renders* them.
 - **A herdr plugin that renames panes with no manual-name check will fight
   every other one.** `nengqi/herdr-session-sync` renamed every pane from the
   foreground process, then the PTY title, then the cwd basename, gated only

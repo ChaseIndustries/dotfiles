@@ -94,6 +94,32 @@ install_herdr_plugin() {
   herdr plugin install "$repo" --yes >/dev/null
 }
 
+# Register a plugin we keep a patched local copy of, instead of pulling it from
+# GitHub. `herdr plugin link` points herdr straight at the checkout, so nothing
+# can quietly overwrite the patch the way a plugin update would.
+link_herdr_plugin() {
+  local path="$1" plugin_id="$2"
+  if ! command -v herdr >/dev/null 2>&1; then
+    echo "  skipping herdr plugin $plugin_id (herdr not installed)"
+    return
+  fi
+  # Capture before grepping: piping into `grep -q` can SIGPIPE herdr mid-write,
+  # which pipefail then reports as a failure even though grep matched.
+  local installed
+  installed="$(herdr plugin list 2>/dev/null || true)"
+  if grep -q "local:$path" <<< "$installed"; then
+    echo "  herdr plugin already linked: $plugin_id"
+    return
+  fi
+  # A GitHub-installed copy claims the same plugin id and blocks the link.
+  if grep -q "^- $plugin_id " <<< "$installed"; then
+    echo "  replacing github copy of herdr plugin: $plugin_id"
+    herdr plugin uninstall "$plugin_id" >/dev/null || true
+  fi
+  echo "  linking herdr plugin: $plugin_id -> $path"
+  herdr plugin link "$path" --enabled >/dev/null
+}
+
 unlink_file() {
   local dst="$1"
 
@@ -146,7 +172,9 @@ cmd_install() {
 
   ensure_repos_root_symlink
 
-  install_herdr_plugin "danbuhler/herdr-pane-topic-sync"
+  # Patched fork of danbuhler/herdr-pane-topic-sync, not the upstream install:
+  # it splits `respect_manual_names` per kind. See AGENTS.md.
+  link_herdr_plugin "$DOTFILES_DIR/herdr/plugins/pane-topic-sync-fork" "dan.pane-topic-sync"
   install_herdr_plugin "T0mSIlver/herdr-title-wrap"
   # nengqi/herdr-session-sync is deliberately NOT installed -- it renamed every
   # pane from the PTY title with no manual-name check, clobbering hand-named
@@ -198,6 +226,9 @@ cmd_uninstall() {
   unlink_file "$HOME/raycast-scripts/herdr-new-workspace.sh"
   unlink_file "$HOME/.config/nvim/init.lua"
   unlink_file "$HOME/.config/worktrunk/config.toml"
+  if command -v herdr >/dev/null 2>&1; then
+    herdr plugin unlink dan.pane-topic-sync >/dev/null 2>&1 || true
+  fi
   echo "Done."
 }
 
