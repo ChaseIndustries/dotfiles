@@ -190,6 +190,21 @@ type = "plugin_action"
 command = "herdr-grid.open"
 description = "Open herdr-grid layout editor"
 
+# herdr-beads (https://github.com/miiraheart/herdr-beads): bd task board. The
+# dock toggles per tab. The floating board is a session-modal popup, so the
+# key can't close it again; press q inside it.
+[[keys.command]]
+key = ["prefix+shift+b", "ctrl+alt+b"]
+type = "plugin_action"
+command = "herdr-beads.open-dock"
+description = "Toggle beads dock"
+
+[[keys.command]]
+key = ["prefix+shift+k", "ctrl+alt+shift+b"]
+type = "plugin_action"
+command = "herdr-beads.open-board"
+description = "Open beads board"
+
 # Replaces the built-in new_workspace action (disabled above): a plain new
 # workspace should come up with claude on top and a plain zsh shell below,
 # not a single empty pane. Script lives in dotfiles/herdr/scripts and is

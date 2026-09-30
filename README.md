@@ -19,7 +19,7 @@ Personal shell config and utilities. No credentials — those live separately.
 
 `install.sh` also installs the herdr plugins this config depends on
 (`T0mSIlver/herdr-title-wrap`, `ubuntudroid/herdr-git-stack`,
-`cloudmanic/herdr-plus`, `thuanlm215/herdr-grid`) via
+`cloudmanic/herdr-plus`, `thuanlm215/herdr-grid`, `miiraheart/herdr-beads`) via
 `herdr plugin install <owner/repo>`, skipped gracefully if herdr isn't
 installed yet. The plugin config files in `herdr/plugins/` are symlinked
 so the plugin picks them up.
@@ -42,6 +42,8 @@ AGENTS.md.
 Open herdr-deck explicitly with `prefix+o` or `ctrl+alt+o`; `alt+o` toggles between the last two projects. It's not the default for new tabs/splits/launch — its binary has no headless mode (only `--open-link`/`--restore-editors`/`--toggle-project`/`--record-workspace-focus`; anything else always launches its interactive picker), so forcing it onto every new pane means an unavoidable popup + manual pick every time. `new_tab`/`split_vertical`/`split_horizontal` stay plain blank panes.
 
 `prefix+t` (or `ctrl+alt+g`) opens [herdr-grid](https://github.com/thuanlm215/herdr-grid), a popup layout editor for the active tab: drag a pane onto another to swap them, drop on an edge to create a split, drag dividers to resize. Herdr itself only does border-drag resizing and a right-click `Split right`/`Split down` menu, so this covers the mouse gestures it lacks. The preview is committed on `Enter`, so live PTYs and scrollback survive.
+
+`prefix+shift+b` (or `ctrl+alt+b`) toggles [herdr-beads](https://github.com/miiraheart/herdr-beads), a `bd` task board docked as a sidebar on the left of the tab. `prefix+shift+k` (or `ctrl+alt+shift+b`) opens the same board as a full screen popup. The popup grabs every key, so close it with `q` from inside. It needs `bd` on `PATH` and a Rust toolchain, since it builds from source on install.
 
 The herdr prefix is `ctrl+space`, not the default `ctrl+b`, because Claude Code binds `ctrl+b` to background a running Bash tool call and Claude runs in most panes here. This needs exactly one macOS keyboard layout enabled: with two or more, the system's "select previous input source" shortcut is also `ctrl+space` and swallows it before herdr sees it. Every frequently used action also has a direct `ctrl+alt+*` chord (`w` workspace picker, `s` settings, `r` resize mode, `o` herdr-deck, `g` herdr-grid, plus the existing split/focus/tab chords), so prefix mode is a convenience rather than the only way in.
 
