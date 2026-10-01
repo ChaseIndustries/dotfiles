@@ -186,6 +186,7 @@ cmd_install() {
 
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"
+  link "$DOTFILES_DIR/claude/keybindings.json"        "$HOME/.claude/keybindings.json"
   link "$DOTFILES_DIR/herdr/config.toml"                          "$HOME/.config/herdr/config.toml"
   link "$DOTFILES_DIR/herdr/plugins/dan.pane-topic-sync/config.toml" "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   link "$DOTFILES_DIR/herdr/plugins/cloudmanic.herdr-plus/worktrees/dual-pane.toml" "$HOME/.config/herdr/plugins/config/cloudmanic.herdr-plus/worktrees/dual-pane.toml"
@@ -218,6 +219,7 @@ cmd_uninstall() {
   remove_zshrc_block
   unlink_file "$HOME/.config/zsh/functions.zsh"
   unlink_file "$HOME/.claude/settings.json"
+  unlink_file "$HOME/.claude/keybindings.json"
   unlink_file "$HOME/.config/herdr/config.toml"
   unlink_file "$HOME/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml"
   unlink_file "$HOME/.config/herdr/plugins/config/cloudmanic.herdr-plus/worktrees/dual-pane.toml"

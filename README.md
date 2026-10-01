@@ -8,6 +8,7 @@ Personal shell config and utilities. No credentials — those live separately.
 | ----------------------------------------------- | ---------------------------------------------------------------- |
 | `zsh/functions.zsh`                             | `~/.config/zsh/functions.zsh`                                    |
 | `claude/settings.json`                          | `~/.claude/settings.json`                                        |
+| `claude/keybindings.json`                       | `~/.claude/keybindings.json`                                     |
 | `herdr/config.toml`                             | `~/.config/herdr/config.toml`                                    |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `herdr/plugins/pane-topic-sync-fork/`           | linked in place via `herdr plugin link` (not symlinked)          |
