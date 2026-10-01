@@ -6,7 +6,7 @@
       "context": "Chat",
       "bindings": {
         "space": null,
-        "shift+space": "voice:pushToTalk"
+        "ctrl+alt+v": "voice:pushToTalk"
       }
     }
   ]
