@@ -50,7 +50,7 @@ Open herdr-deck explicitly with `prefix+o` or `ctrl+alt+o`; `alt+o` toggles betw
 
 The herdr prefix is `ctrl+space`, not the default `ctrl+b`, because Claude Code binds `ctrl+b` to background a running Bash tool call and Claude runs in most panes here. This needs exactly one macOS keyboard layout enabled: with two or more, the system's "select previous input source" shortcut is also `ctrl+space` and swallows it before herdr sees it. Every frequently used action also has a direct `ctrl+alt+*` chord (`w` workspace picker, `s` settings, `r` resize mode, `o` herdr-deck, `g` herdr-grid, plus the existing split/focus/tab chords), so prefix mode is a convenience rather than the only way in.
 
-`worktrunk/config.toml` pins `wt`'s worktree layout to `~/Repos/.herdr-worktrees/`, matching Herdr's own `[worktrees]` directory and the `git worktree add` wrapper in `functions.zsh` — otherwise worktrees created through herdr-deck (which shells out to `wt`) would land in a different place than everything else.
+`worktrunk/config.toml` pins `wt`'s worktree layout to `~/Projects/.herdr-worktrees/`, matching Herdr's own `[worktrees]` directory and the `git worktree add` wrapper in `functions.zsh` — otherwise worktrees created through herdr-deck (which shells out to `wt`) would land in a different place than everything else.
 
 `install.sh` also adds a marked block to `~/.zshrc` that puts `~/bin` on
 `PATH`, sources `functions.zsh`, and initializes `zoxide` (not itself a

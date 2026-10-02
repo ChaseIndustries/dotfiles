@@ -57,10 +57,10 @@ remove_zshrc_block() {
 
 ensure_repos_root_symlink() {
   local target="${REPOS_ROOT:-}"
-  local link_path="$HOME/Repos"
+  local link_path="$HOME/Projects"
 
   # Unset or pointing at the default itself: nothing to do, tools already
-  # hardcode ~/Repos as their literal default.
+  # hardcode ~/Projects as their literal default.
   [[ -z "$target" || "$target" == "$link_path" ]] && return
 
   if [[ -L "$link_path" ]]; then
@@ -76,7 +76,7 @@ ensure_repos_root_symlink() {
     fi
   elif [[ -e "$link_path" ]]; then
     echo "  skipping: $link_path already exists as a real directory."
-    echo "    herdr/worktrunk hardcode ~/Repos/... as their worktree pool; REPOS_ROOT=$target won't take effect there"
+    echo "    herdr/worktrunk hardcode ~/Projects/... as their worktree pool; REPOS_ROOT=$target won't take effect there"
     echo "    until you migrate its contents (e.g. via 'git worktree move' for each worktree) and replace it with a symlink yourself."
   else
     ln -s "$target" "$link_path"

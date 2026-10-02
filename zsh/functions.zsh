@@ -24,10 +24,10 @@ function _dotfiles_resolve_bin() {
 HERDR_BIN="$(_dotfiles_resolve_bin herdr "$HOME/.local/bin/herdr" /opt/homebrew/bin/herdr /usr/local/bin/herdr "$HOME/.cargo/bin/herdr")"
 CODE_BIN="$(_dotfiles_resolve_bin code /usr/local/bin/code /opt/homebrew/bin/code "$HOME/.local/bin/code" /Applications/Cursor.app/Contents/Resources/app/bin/code)"
 
-# Where your actual repo checkouts live. Defaults to ~/Repos; export
+# Where your actual repo checkouts live. Defaults to ~/Projects; export
 # REPOS_ROOT in your local (untracked) shell config to point it elsewhere
 # on a given machine without hardcoding a client/employer-specific path here.
-REPOS_ROOT="${REPOS_ROOT:-$HOME/Repos}"
+REPOS_ROOT="${REPOS_ROOT:-$HOME/Projects}"
 
 # Run `code <path>` only when inside Cursor's wrapped terminal
 # (GIT_WRAPPER_CONTEXT set). Outside that context, do nothing so running these

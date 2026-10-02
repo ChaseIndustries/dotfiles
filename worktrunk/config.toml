@@ -6,7 +6,7 @@
 # created through any of the three (Herdr's own new_worktree action, the
 # git wrapper, or herdr-deck via wt) always lands in the same place.
 # worktrunk's template engine has no env-var expansion (only ~), so this
-# stays a generic literal ~/Repos path. install.sh symlinks ~/Repos ->
+# stays a generic literal ~/Projects path. install.sh symlinks ~/Projects ->
 # $REPOS_ROOT when that env var points elsewhere, so it resolves correctly
 # per machine without hardcoding an employer-specific path here.
-worktree-path = "~/Repos/.herdr-worktrees/{{ repo }}-{{ branch | sanitize }}"
+worktree-path = "~/Projects/.herdr-worktrees/{{ repo }}-{{ branch | sanitize }}"
