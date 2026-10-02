@@ -10,6 +10,9 @@ config immediately. No build step, no deploy step.
 |---|---|
 | `zsh/functions.zsh` | `~/.config/zsh/functions.zsh` |
 | `claude/settings.json` | `~/.claude/settings.json` |
+| `claude/keybindings.json` | `~/.claude/keybindings.json` |
+| `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` (just imports `AGENTS.md`) |
+| `claude/AGENTS.md` | `~/.claude/AGENTS.md`, my global agent instructions |
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `herdr/plugins/pane-topic-sync-fork/` | registered in place by `herdr plugin link` — not symlinked |
