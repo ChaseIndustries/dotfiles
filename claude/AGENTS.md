@@ -23,3 +23,4 @@ You are probably running inside a herdr pane. `HERDR_ENV=1` and `HERDR_PANE_ID` 
 - Never run `herdr server stop`. It kills every pane, including the one you live in.
 - Track multi-session work with beads (`bd`) in repos that have a `.beads` directory. File what you find, claim what you start, close what you finish. Don't `bd init` a repo without asking. I watch the board in herdr (`ctrl+alt+b`).
 - My dotfiles live in `~/Projects/dotfiles` and are symlinked into place, this file included. Edit them there, not at the symlink.
+- For browser automation, use the `playwright-cli` command through Bash. The Playwright MCP server is disabled on purpose because its tool listings cost tokens on every session. Run `playwright-cli --help` for commands. Typical loop: `open <url>`, `snapshot`, `click <ref>`, `screenshot`, `close`. Always `close` when done, and delete the `.playwright-cli/` folder it leaves in the working directory.
