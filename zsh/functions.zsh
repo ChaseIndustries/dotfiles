@@ -60,7 +60,7 @@ function _worktree_navigate() {
     echo "Changing directory to $path..."
     cd "$path"
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-      "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null &!
+      "$HERDR_BIN" worktree open --path "$path" --no-focus 2>/dev/null &!
     fi
     return 0
   fi
