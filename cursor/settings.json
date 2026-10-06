@@ -95,4 +95,5 @@
   "terminal.integrated.rightClickBehavior": "nothing",
   "terminal.integrated.inheritEnv": false,
   "terminal.integrated.confirmOnKill": "never",
+  "editor.accessibilitySupport": "off",
 }

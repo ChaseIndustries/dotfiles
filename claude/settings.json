@@ -3,6 +3,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "GIT_WRAPPER_CONTEXT": "claude"
   },
+  "respondToBashCommands": false,
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
