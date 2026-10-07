@@ -16,6 +16,7 @@ config immediately. No build step, no deploy step.
 | `herdr/config.toml` | `~/.config/herdr/config.toml` |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `herdr/plugins/pane-topic-sync-fork/` | registered in place by `herdr plugin link` — not symlinked |
+| `herdr/plugins/beads-workspace-dock/` | registered in place by `herdr plugin link`. Docks herdr-beads per workspace, not per tab |
 | `cursor/settings.json` | `~/Library/Application Support/Cursor/User/settings.json` |
 | `cursor/keybindings.json` | `~/Library/Application Support/Cursor/User/keybindings.json` |
 | `raycast/herdr-new-workspace.sh` | `~/raycast-scripts/herdr-new-workspace.sh` |

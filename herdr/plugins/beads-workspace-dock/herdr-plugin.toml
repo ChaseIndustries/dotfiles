@@ -1,0 +1,14 @@
+# Open the herdr-beads dock in each new workspace, not every new tab.
+# herdr-beads' own auto-dock (the `A` key) hooks tab.created, which is too
+# eager. Leave that off and let this hook workspace.created instead.
+
+id = "jchase.beads-workspace-dock"
+name = "Beads workspace dock"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "Open the herdr-beads dock in the first tab of every new workspace."
+platforms = ["linux", "macos"]
+
+[[events]]
+on = "workspace.created"
+command = ["bash", "dock.sh"]

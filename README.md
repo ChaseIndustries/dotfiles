@@ -14,6 +14,7 @@ Personal shell config and utilities. No credentials — those live separately.
 | `herdr/config.toml`                             | `~/.config/herdr/config.toml`                                    |
 | `herdr/plugins/dan.pane-topic-sync/config.toml` | `~/.config/herdr/plugins/config/dan.pane-topic-sync/config.toml` |
 | `herdr/plugins/pane-topic-sync-fork/`           | linked in place via `herdr plugin link` (not symlinked)          |
+| `herdr/plugins/beads-workspace-dock/`           | linked in place via `herdr plugin link` (not symlinked)          |
 | `cursor/settings.json`                          | `~/Library/Application Support/Cursor/User/settings.json`        |
 | `cursor/keybindings.json`                       | `~/Library/Application Support/Cursor/User/keybindings.json`     |
 | `raycast/herdr-new-workspace.sh`                | `~/raycast-scripts/herdr-new-workspace.sh`                       |

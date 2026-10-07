@@ -183,6 +183,9 @@ cmd_install() {
   install_herdr_plugin "cloudmanic/herdr-plus"
   install_herdr_plugin "thuanlm215/herdr-grid"
   install_herdr_plugin "miiraheart/herdr-beads"
+  # Docks herdr-beads in each new workspace. Its built-in `A` auto-dock
+  # fires on every new tab instead, so keep that one off.
+  link_herdr_plugin "$DOTFILES_DIR/herdr/plugins/beads-workspace-dock" "jchase.beads-workspace-dock"
 
   link "$DOTFILES_DIR/zsh/functions.zsh"              "$HOME/.config/zsh/functions.zsh"
   link "$DOTFILES_DIR/claude/settings.json"           "$HOME/.claude/settings.json"
@@ -235,6 +238,7 @@ cmd_uninstall() {
   unlink_file "$HOME/.config/worktrunk/config.toml"
   if command -v herdr >/dev/null 2>&1; then
     herdr plugin unlink dan.pane-topic-sync >/dev/null 2>&1 || true
+    herdr plugin unlink jchase.beads-workspace-dock >/dev/null 2>&1 || true
   fi
   echo "Done."
 }
