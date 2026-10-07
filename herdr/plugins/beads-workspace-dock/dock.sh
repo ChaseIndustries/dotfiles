@@ -39,8 +39,28 @@ read -r ROOT CWD <<<"$(first_pane_in_tab "$TAB")"
 
 # Splitting and swapping drag focus into the new workspace even with
 # --no-focus. A `worktree create --no-focus` should stay unfocused, so put the
-# user back wherever they were.
-WAS="$("$HERDR" workspace list 2>/dev/null | python3 -c '
+# user back wherever they were. Agents often create several worktrees at once,
+# and each hook then sees a sibling's fresh workspace as "focused". So hooks
+# take turns under a lock, remember which workspaces are brand new, and never
+# treat one of those as home.
+STATE="${TMPDIR:-/tmp}/beads-workspace-dock"
+mkdir -p "$STATE"
+for _ in $(seq 100); do
+  mkdir "$STATE/lock" 2>/dev/null && break
+  # A crashed hook can leave the lock behind. Steal it once it's stale.
+  [ -n "$(find "$STATE/lock" -maxdepth 0 -mmin +1 2>/dev/null)" ] && rmdir "$STATE/lock"
+  sleep 0.1
+done
+trap 'rmdir "$STATE/lock" 2>/dev/null' EXIT
+
+now="$(date +%s)"
+touch "$STATE/fresh"
+awk -v now="$now" '$1 > now - 60' "$STATE/fresh" >"$STATE/fresh.tmp"
+echo "$now $WS" >>"$STATE/fresh.tmp"
+mv "$STATE/fresh.tmp" "$STATE/fresh"
+
+focused() {
+  "$HERDR" workspace list 2>/dev/null | python3 -c '
 import json, sys
 try:
     d = json.load(sys.stdin)
@@ -50,10 +70,25 @@ for w in (d.get("result") or {}).get("workspaces") or []:
     if w.get("focused") and w.get("workspace_id"):
         print(w["workspace_id"])
         break
-' 2>/dev/null)"
+' 2>/dev/null
+}
+is_fresh() { awk -v id="$1" '$2 == id { f = 1 } END { exit !f }' "$STATE/fresh"; }
+
+WAS="$(focused)"
+if [ -n "$WAS" ] && ! is_fresh "$WAS"; then
+  echo "$WAS" >"$STATE/home"
+else
+  WAS="$(cat "$STATE/home" 2>/dev/null)"
+fi
 
 open_dock_at "$ROOT" "${CWD:-}" nofocus
 
-if [ -n "$WAS" ] && [ "$WAS" != "$WS" ]; then
-  "$HERDR" workspace focus "$WAS" >/dev/null 2>&1
+# Other plugins (herdr-plus layouts) can yank focus a beat later, so check twice.
+if [ -n "$WAS" ]; then
+  for _ in 1 2; do
+    cur="$(focused)"
+    [ -n "$cur" ] && [ "$cur" != "$WAS" ] && is_fresh "$cur" &&
+      "$HERDR" workspace focus "$WAS" >/dev/null 2>&1
+    sleep 0.3
+  done
 fi

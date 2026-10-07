@@ -133,6 +133,15 @@ takes effect on existing machines too, not just fresh ones.
   ~/.config/herdr/herdr-server.log | grep -o 'request_id="[^":]*'  | sort |
   uniq -c` attributes the writes (`cli` = a plugin shelling out to the herdr
   CLI, `sync` = session-sync's direct RPC).
+- **Every herdr pane split or resize focuses that pane's workspace, `--no-focus`
+  or not.** So any `workspace.created` hook that touches layout (our
+  `beads-workspace-dock`, herdr-plus layouts) steals focus and must put it
+  back. Snapshotting "the focused workspace" at hook start breaks when an agent
+  creates several worktrees at once: later hooks catch a sibling's fresh
+  workspace mid-flicker and dutifully restore focus *to it*. `dock.sh` now
+  serializes hooks with a lock and keeps a 60s list of fresh workspace IDs it
+  refuses to treat as home. A ~150ms flicker per worktree remains; that part
+  is herdr's.
 
 ## Workflow
 
