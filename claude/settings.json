@@ -3,7 +3,6 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "GIT_WRAPPER_CONTEXT": "claude"
   },
-  "respondToBashCommands": false,
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -53,7 +52,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "claude-opus-4-8",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "WorktreeCreate": [
@@ -92,6 +91,7 @@
   "worktree": {
     "baseRef": "fresh"
   },
+  "respondToBashCommands": false,
   "enabledPlugins": {
     "beads@beads-marketplace": true,
     "coderabbit@claude-plugins-official": true,
@@ -104,12 +104,16 @@
     "remember@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-4-8": {}
+  },
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "skipDangerousModePermissionPrompt": true,
+  "switchModelsOnFlag": false,
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,

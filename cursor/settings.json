@@ -96,4 +96,14 @@
   "terminal.integrated.inheritEnv": false,
   "terminal.integrated.confirmOnKill": "never",
   "editor.accessibilitySupport": "off",
+  "workbench.editor.enablePreview": false,
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+  "workbench.editorAssociations": {
+    "*.md": "ipreview.live",
+    "*.markdown": "ipreview.live"
+  },
+  "window.newWindowProfile": "Default",
+  "workbench.editor.wrapTabs": false,
 }
