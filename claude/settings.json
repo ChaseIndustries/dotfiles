@@ -52,7 +52,6 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-opus-4-8",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "WorktreeCreate": [
@@ -103,15 +102,12 @@
     "linear@claude-plugins-official": false,
     "remember@claude-plugins-official": true
   },
-  "effortLevel": "xhigh",
-  "modelSettings": {
-    "claude-opus-4-8": {}
-  },
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "effortLevel": "auto",
   "skipDangerousModePermissionPrompt": true,
   "switchModelsOnFlag": false,
   "teammateMode": "auto",
