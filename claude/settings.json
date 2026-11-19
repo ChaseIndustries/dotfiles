@@ -52,6 +52,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "sonnet",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "WorktreeCreate": [
@@ -107,7 +108,6 @@
     "enabled": true,
     "mode": "hold"
   },
-  "effortLevel": "auto",
   "skipDangerousModePermissionPrompt": true,
   "switchModelsOnFlag": false,
   "teammateMode": "auto",

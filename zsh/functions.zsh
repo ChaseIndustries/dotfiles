@@ -60,7 +60,8 @@ function _worktree_navigate() {
     echo "Changing directory to $path..."
     cd "$path"
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-      "$HERDR_BIN" worktree open --path "$path" --no-focus 2>/dev/null &!
+      # herdr CLI speaks JSON on stdout — silence it so checkout output stays clean.
+      "$HERDR_BIN" worktree open --path "$path" --no-focus >/dev/null 2>&1 &!
     fi
     return 0
   fi
@@ -83,10 +84,10 @@ for wt in data.get('result', {}).get('worktrees', []):
 " "$path" 2>/dev/null)
     if [[ -n "$existing_workspace" ]]; then
       echo "Focusing existing herdr workspace $existing_workspace for $path..."
-      "$HERDR_BIN" workspace focus "$existing_workspace"
+      "$HERDR_BIN" workspace focus "$existing_workspace" >/dev/null 2>&1
     else
       echo "Opening $path in new herdr workspace + Cursor..."
-      "$HERDR_BIN" workspace create --cwd "$path" --label "$label" --focus
+      "$HERDR_BIN" workspace create --cwd "$path" --label "$label" --focus >/dev/null 2>&1
       /usr/bin/env -u HERDR_ENV -u HERDR_PANE_ID -u HERDR_SOCKET_PATH -u HERDR_TAB_ID -u HERDR_WORKSPACE_ID \
         PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" --new-window "$path"
     fi
@@ -95,8 +96,10 @@ for wt in data.get('result', {}).get('worktrees', []):
     PATH="${CODE_BIN:h}:/usr/local/bin:/opt/homebrew/bin:/bin:/usr/bin:$PATH" "$CODE_BIN" "$path"
     # Keep herdr command center in sync when navigating from Cursor terminal.
     if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-      "$HERDR_BIN" worktree open --path "$path" --no-focus 2>/dev/null &!
+      "$HERDR_BIN" worktree open --path "$path" --no-focus >/dev/null 2>&1 &!
     fi
+    # Also cd so this shell follows the worktree (open alone left PWD behind).
+    cd "$path"
   else
     echo "Changing directory to $path..."
     cd "$path"
@@ -128,6 +131,24 @@ function _worktree_checkout() {
     in_main_repo=true
   fi
 
+  # If the target branch is already checked out in a worktree, jump there —
+  # whether we were invoked from the main workspace or another worktree.
+  # (Previously this only ran outside main, so `git checkout` from main printed
+  # a fatal error before falling through to the error-message parser.)
+  if [[ "$1" == "git" && "$2" == "checkout" && -n "$3" ]]; then
+    local existing_worktree
+    existing_worktree=$(command git -C "$main_root" worktree list --porcelain 2>/dev/null \
+      | command awk -v want="refs/heads/$3" 'BEGIN{wt=""} /^worktree / {wt=$2} /^branch / {if ($2==want) {print wt; exit}}')
+    if [[ -n "$existing_worktree" && -d "$existing_worktree" ]]; then
+      if [[ "$toplevel" == "$existing_worktree" ]]; then
+        return 0
+      fi
+      echo "Branch '$3' is already checked out in worktree at $existing_worktree"
+      _worktree_navigate "$existing_worktree"
+      return 0
+    fi
+  fi
+
   if [[ "$in_main_repo" == false ]]; then
     # Pre-flight check for `git checkout <branch>`: if the branch doesn't exist
     # locally or on any remote, fail fast in the current directory instead of
@@ -139,18 +160,6 @@ function _worktree_checkout() {
         && ! command git -C "$main_root" show-ref --verify --quiet "refs/tags/$branch"; then
         command git checkout "$branch"
         return $?
-      fi
-    fi
-
-    # If the target branch is already checked out in another worktree, jump there
-    # directly instead of detouring through the main workspace.
-    if [[ "$1" == "git" && "$2" == "checkout" && -n "$3" ]]; then
-      local existing_worktree
-      existing_worktree=$(command git -C "$main_root" worktree list --porcelain 2>/dev/null \
-        | command awk -v want="refs/heads/$3" 'BEGIN{wt=""} /^worktree / {wt=$2} /^branch / {if ($2==want) {print wt; exit}}')
-      if [[ -n "$existing_worktree" && -d "$existing_worktree" ]]; then
-        _worktree_navigate "$existing_worktree"
-        return 0
       fi
     fi
 
@@ -213,24 +222,10 @@ function git() {
   fi
 
   if [[ "$1" == "checkout" && $# -eq 2 ]]; then
-    # For `main`/`master`, never switch another worktree's branch — navigate to the
-    # main workspace instead. If we're already in the main workspace, fall through
-    # to a normal checkout.
-    if [[ "$2" == "main" || "$2" == "master" ]]; then
-      local main_git main_root toplevel
-      main_git=$(command git rev-parse --git-common-dir 2>/dev/null)
-      if [[ -n "$main_git" ]]; then
-        main_root=$(cd "${main_git:h}" && pwd)
-        toplevel=$(command git rev-parse --show-toplevel 2>/dev/null)
-        if [[ "$toplevel" != "$main_root" ]]; then
-          echo "Skipping checkout — navigating to main workspace at $main_root..."
-          _worktree_navigate "$main_root"
-          return 0
-        fi
-      fi
-      command git checkout "$2"
-      return $?
-    fi
+    # Resolve via worktree list for every branch, including main/master.
+    # The primary checkout is not always on main (e.g. app keeps main in
+    # .herdr-worktrees/app/integrate-main) — a special-case that assumed
+    # "main repo root == main branch" broke `git checkout main` from ../app.
     _worktree_checkout "git checkout $2" git checkout "$2"
     return $?
   fi
@@ -347,7 +342,7 @@ function wto() {
   fi
 
   if [[ -S "$HOME/.config/herdr/herdr.sock" ]]; then
-    "$HERDR_BIN" worktree open --path "$path" --focus 2>/dev/null
+    "$HERDR_BIN" worktree open --path "$path" --focus >/dev/null 2>&1
   fi
 
   if [[ "$GIT_WRAPPER_CONTEXT" != "claude" && -n "$CODE_BIN" ]]; then
@@ -377,7 +372,7 @@ for wt in data.get('result', {}).get('worktrees', []):
   fi
 
   echo "Closing herdr workspace $ws_id for $branch..."
-  "$HERDR_BIN" workspace close "$ws_id"
+  "$HERDR_BIN" workspace close "$ws_id" >/dev/null 2>&1
 }
 
 # List worktrees that look safe to remove: branch is merged into the repo's
